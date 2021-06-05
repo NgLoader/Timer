@@ -1,0 +1,41 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>de.ngloader</groupId>
+	<artifactId>timer</artifactId>
+	<version>${revision}</version>
+	<packaging>pom</packaging>
+
+	<modules>
+		<module>timer-core</module>
+		<module>timer-plugin</module>
+		<module>timer-api</module>
+	</modules>
+
+	<properties>
+		<revision>1.0-develop</revision>
+
+		<dependency.bungeecord.version>1.16-R0.5-SNAPSHOT</dependency.bungeecord.version>
+		<dependency.bukkit.version>1.16.5-R0.1-SNAPSHOT</dependency.bukkit.version>
+		<dependency.gson.version>2.8.6</dependency.gson.version>
+
+		<plugin.shade.version>3.2.1</plugin.shade.version>
+
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	</properties>
+
+	<repositories>
+        <repository>
+            <id>bungeecord-repo</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </repository>
+	</repositories>
+
+	<build>
+		<defaultGoal>clean package -pl timer-plugin --also-make</defaultGoal>
+	</build>
+</project>

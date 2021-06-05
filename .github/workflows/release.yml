@@ -1,0 +1,61 @@
+name: Releases
+
+on:
+  push:
+    tags:
+    - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+
+    - name: Set up JDK
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+        server-id: github
+        server-username: GITHUB_USER_REF
+        server-password: GITHUB_TOKEN_REF
+ 
+    - name: BuildTools cache
+      uses: actions/cache@v2
+      with:
+        path: ~/.m2/repository/org/spigotmc/spigot
+        key: ${{ runner.os }}-maven-${{ hashFiles('./.github/workflows/buildtools.sh') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+    - name: BuildTools
+      run: |
+        sh ./.github/workflows/buildtools.sh
+ 
+    - name: Build
+      run: |
+        mvn clean install -pl :timer-plugin-bukkit,:timer-plugin-bungee -B -am "-Drevision=$(git describe --tags `git rev-list --tags --max-count=1`)"
+        mkdir dist
+        mv timer-plugin/*/target/timer-*.jar ./dist
+        mv timer-api/timer-api-core/timer-*.jar ./dist
+        mv timer-core/timer-*.jar ./dist
+      env:
+        GITHUB_USER_REF: ${{ secrets.GH_PACKAGE_REPO_USERNAME }}
+        GITHUB_TOKEN_REF: ${{ secrets.GH_PACKAGE_REPO_PASSWORD  }}
+
+    - uses: ncipollo/release-action@v1
+      with:
+        artifacts: "dist/*"
+        name: Release ${{ env.RELEASE_VERSION }}
+        token: ${{ secrets.GH_PACKAGE_REPO_PASSWORD  }}
+
+
+    - name: Set up Java for publishing to GitHub Packages
+      uses: actions/setup-java@v2
+      with:
+        java-version: '11'
+        distribution: 'adopt'
+    - name: Publish to GitHub Packages
+      run: mvn --batch-mode deploy "-Drevision=$(git describe --tags `git rev-list --tags --max-count=1`)"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_PACKAGE_REPO_PASSWORD }}
