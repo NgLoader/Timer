@@ -1,10 +1,12 @@
 package de.ngloader.timer.core.timer.message;
 
+import de.ngloader.timer.api.config.Exclude;
 import de.ngloader.timer.api.timer.Timer;
 import de.ngloader.timer.api.timer.message.TimerMessage;
 
 public class ImplTimerMessage implements TimerMessage {
 
+	@Exclude
 	private final Timer timer;
 
 	private long tick = 0;

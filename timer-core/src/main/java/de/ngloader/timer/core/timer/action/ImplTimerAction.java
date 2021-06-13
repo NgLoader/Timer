@@ -2,12 +2,14 @@ package de.ngloader.timer.core.timer.action;
 
 import java.util.function.Consumer;
 
+import de.ngloader.timer.api.config.Exclude;
 import de.ngloader.timer.api.timer.Timer;
 import de.ngloader.timer.api.timer.TimerTickable;
 import de.ngloader.timer.api.timer.action.TimerAction;
 
 public abstract class ImplTimerAction implements TimerAction, TimerTickable {
 
+	@Exclude
 	private final Timer timer;
 
 	public ImplTimerAction(Timer timer) {

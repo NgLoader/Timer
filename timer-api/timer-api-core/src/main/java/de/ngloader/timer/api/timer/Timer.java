@@ -18,6 +18,9 @@ public interface Timer extends Runnable {
 
 	public UUID getId();
 
+	public TimerManager getManager();
+	public void setManager(TimerManager manager);
+
 	public String getName();
 	public void setName(String name);
 

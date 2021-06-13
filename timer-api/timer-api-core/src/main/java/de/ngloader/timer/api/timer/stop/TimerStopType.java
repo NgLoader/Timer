@@ -12,6 +12,15 @@ public enum TimerStopType {
 	RESET(TimerStopReset.class),
 	STOP(TimerStopStop.class);
 
+	public static TimerStopType getType(Class<? extends TimerStop> clazz) {
+		for (TimerStopType type : values()) {
+			if (type.getClassType().isAssignableFrom(clazz)) {
+				return type;
+			}
+		}
+		return null;
+	}
+
 	private final Class<? extends TimerStop> classType;
 
 	private TimerStopType(Class<? extends TimerStop> clazzType) {

@@ -8,6 +8,15 @@ public enum TimerActionType {
 	COUNTDOWN(TimerActionCountdown.class),
 	MESSAGE(TimerActionMessage.class);
 
+	public static TimerActionType getType(Class<? extends TimerAction> clazz) {
+		for (TimerActionType type : values()) {
+			if (type.getClassType().isAssignableFrom(clazz)) {
+				return type;
+			}
+		}
+		return null;
+	}
+
 	private final Class<? extends TimerAction> classType;
 
 	private TimerActionType(Class<? extends TimerAction> clazzType) {

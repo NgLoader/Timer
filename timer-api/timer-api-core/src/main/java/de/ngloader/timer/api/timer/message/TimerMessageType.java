@@ -10,6 +10,15 @@ public enum TimerMessageType {
 	COMMAND(TimerMessageCommand.class),
 	EXECUTE(TimerMessageExecute.class);
 
+	public static TimerMessageType getType(Class<? extends TimerMessage> clazz) {
+		for (TimerMessageType type : values()) {
+			if (type.getClassType().isAssignableFrom(clazz)) {
+				return type;
+			}
+		}
+		return null;
+	}
+
 	private final Class<? extends TimerMessage> classType;
 
 	private TimerMessageType(Class<? extends TimerMessage> clazzType) {
