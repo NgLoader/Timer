@@ -1,13 +1,8 @@
 package de.ngloader.timer.core.database;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import de.ngloader.timer.api.TimerPlugin;
 import de.ngloader.timer.api.database.TimerDatabase;
@@ -43,13 +38,13 @@ public class ImplTimerDatabaseJson implements TimerDatabase {
 		}
 
 		Set<Timer> timers = new HashSet<>();
-		try (Stream<Path> paths = Files.walk(Paths.get(config.storagePath))) {
-			paths.filter(Files::isRegularFile).forEach(path -> {
-				
-			});
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		try (Stream<Path> paths = Files.walk(Paths.get(config.storagePath))) {
+//			paths.filter(Files::isRegularFile).forEach(path -> {
+//				
+//			});
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 		return timers;
 	}
 

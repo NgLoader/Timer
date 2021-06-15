@@ -6,19 +6,30 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
+import de.ngloader.timer.api.TimerConfig;
 import de.ngloader.timer.api.TimerPlugin;
+import de.ngloader.timer.api.command.TimerCommandManager;
 import de.ngloader.timer.api.config.ConfigService;
+import de.ngloader.timer.api.database.TimerDatabase;
 import de.ngloader.timer.api.database.TimerDatabaseManager;
+import de.ngloader.timer.api.i18n.TimerConfigTranslation;
+import de.ngloader.timer.api.i18n.TimerLanguageService;
+import de.ngloader.timer.api.i18n.TimerMessage;
+import de.ngloader.timer.api.i18n.TimerModule;
 import de.ngloader.timer.api.timer.Timer;
 import de.ngloader.timer.api.timer.TimerManager;
+import de.ngloader.timer.core.command.ImplCommandManager;
 import de.ngloader.timer.core.config.ImplConfigService;
 import de.ngloader.timer.core.database.ImplTimerDatabaseManager;
+import de.ngloader.timer.core.i18n.ImplTimerLanguage;
 import de.ngloader.timer.core.timer.ImplTimerManager;
 
 public abstract class ImplTimerPlugin extends TimerPlugin {
 
 	private final ConfigService configService;
+	private final TimerLanguageService languageService;
 	private final TimerDatabaseManager databaseManager;
+	private final TimerCommandManager commandManager;
 
 	private final TimerManager defaultManager = new ImplTimerManager();
 	private final Set<TimerManager> managers = new HashSet<>();
@@ -26,16 +37,39 @@ public abstract class ImplTimerPlugin extends TimerPlugin {
 	public ImplTimerPlugin() {
 		TimerPlugin.setPlugin(this);
 
-		this.log("Core", "Loading§8...");
+		this.log(TimerModule.MODULE_CORE, TimerMessage.CORE_LOADING);
+
 		this.configService = new ImplConfigService(this);
+		this.languageService = new ImplTimerLanguage(this);
 		this.databaseManager = new ImplTimerDatabaseManager(this);
+		this.commandManager = new ImplCommandManager(this);
 
 		this.addManager(this.defaultManager);
 
-		this.log("Core", "Loading timers§8...");
+		this.languageService.load();
+		this.databaseManager.setDatabase(this.configService.getConfig(TimerConfig.class).databaseType);
+
+		this.log(TimerModule.MODULE_CORE, TimerMessage.CORE_LOADING_TIMER);
 		this.databaseManager.getDatabase().getTimer().forEach(this.getDefaultManager()::addTimer);
-		this.log("Core", "Loaded §8" + this.defaultManager.getTimers().size() + " §7timer§8.");
-		this.log("Core", "Loaded§8.");
+		this.log(TimerModule.MODULE_CORE, TimerMessage.CORE_LOADED_TIMER, this.defaultManager.getTimers().size());
+
+		this.log(TimerModule.MODULE_CORE, TimerMessage.CORE_LOADED);
+	}
+
+	public void disable() {
+		this.log(TimerModule.MODULE_CORE, TimerMessage.CORE_DISABLING);
+
+		if (this.databaseManager != null && this.databaseManager.getDatabase() != null) {
+			TimerDatabase database = this.databaseManager.getDatabase();
+
+			if (this.defaultManager != null) {
+				this.defaultManager.getTimers().forEach(database::updateTimer);
+			}
+
+			database.closeConnection();
+		}
+
+		this.log(TimerModule.MODULE_CORE, TimerMessage.CORE_DISABLED);
 	}
 
 	@Override
@@ -76,13 +110,26 @@ public abstract class ImplTimerPlugin extends TimerPlugin {
 	}
 
 	@Override
-	public TimerManager getDefaultManager() {
-		return this.defaultManager;
+	public void deleteTimer(Timer timer) {
+		this.managers.forEach(manager -> manager.removeTimer(timer));
 	}
 
 	@Override
-	public void deleteTimer(Timer timer) {
-		this.managers.forEach(manager -> manager.removeTimer(timer));
+	public void log(TimerModule module, TimerMessage message, Object... args) {
+		if (this.languageService == null) {
+			this.log(String.format("%s%s %s", TimerConfigTranslation.PREFIX, module.getMessage(), message.getMessage()));
+			return;
+		}
+
+		this.log(String.format("%s%s %s",
+				this.languageService.getPrefix(),
+				this.languageService.translate(module),
+				this.languageService.translate(message, args)));
+	}
+
+	@Override
+	public TimerManager getDefaultManager() {
+		return this.defaultManager;
 	}
 
 	@Override
@@ -93,5 +140,15 @@ public abstract class ImplTimerPlugin extends TimerPlugin {
 	@Override
 	public ConfigService getConfigService() {
 		return this.configService;
+	}
+
+	@Override
+	public TimerCommandManager getCommandManager() {
+		return this.commandManager;
+	}
+
+	@Override
+	public TimerLanguageService getLanguageService() {
+		return this.languageService;
 	}
 }

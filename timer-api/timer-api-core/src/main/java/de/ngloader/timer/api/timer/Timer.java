@@ -65,7 +65,6 @@ public interface Timer extends Runnable {
 	public long getMaxTick();
 	public void setMaxTick(long ticks);
 
-
 	public Set<TimerTickable> getTickables();
 	public void setTickables(Set<TimerTickable> tickables);
 	public boolean addTickable(TimerTickable tickable);

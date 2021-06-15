@@ -1,0 +1,12 @@
+api-version: 1.13
+
+name: Timer
+author: NgLoader
+version: 2.0.0
+
+main: de.ngloader.timer.bukkit.BukkitTimerPlugin
+
+commands:
+  timer:
+    description: Create/Edit or delete a timer
+    aliases: [ timers, countdown ]

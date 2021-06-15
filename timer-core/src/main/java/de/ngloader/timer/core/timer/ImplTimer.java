@@ -107,7 +107,7 @@ public class ImplTimer implements Timer {
 		} else {
 			this.typeAction(TimerType::disable, this.actionType);
 			this.messages.forEach(TimerMessage::disable);
-			this.typeAction(TimerType::disable, this.stopType, this.sortType);
+			this.typeAction(TimerType::disable, this.sortType, this.stopType);
 		}
 	}
 
@@ -238,7 +238,7 @@ public class ImplTimer implements Timer {
 		return this.tickables.remove(tickable);
 	}
 
-	private void checkTickable(TimerType<?> type, boolean remove) {
+	private void updateTickable(TimerType<?> type, boolean remove) {
 		if (type != null && type instanceof TimerTickable) {
 			if (remove) {
 				this.removeTickable((TimerTickable) type);
@@ -257,14 +257,14 @@ public class ImplTimer implements Timer {
 	}
 
 	private <T extends TimerType<?>> T switchAction(T before, T after) {
-		this.checkTickable(before, true);
+		this.updateTickable(before, true);
 		if (this.enabled) {
 			this.typeAction(TimerType::disable, before);
 			this.typeAction(TimerType::enable, after);
 		} else {
 			this.typeAction(TimerType::disable, after);
 		}
-		this.checkTickable(after, false);
+		this.updateTickable(after, false);
 		return after;
 	}
 

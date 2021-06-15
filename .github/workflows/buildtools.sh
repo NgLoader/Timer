@@ -1,5 +1,6 @@
 # Author
 # Imprex-Development
+# https://github.com/Imprex-Development/Orebfuscator/blob/master/.github/workflows/buildtools.sh
 
 build () {
 	echo Building $1 ...
@@ -7,7 +8,7 @@ build () {
     cd $1
 
     curl -o BuildTools.jar https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar
-    java -jar BuildTools.jar --rev $1
+    java -jar BuildTools.jar --rev $1 --remapped
 
     cd ..
 }
@@ -20,4 +21,4 @@ checkVersion () {
 	fi
 }
 
-checkVersion 1.16.5
+checkVersion 1.17

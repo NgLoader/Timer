@@ -17,5 +17,10 @@
 			<version>${dependency.gson.version}</version>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.mojang</groupId>
+			<artifactId>brigadier</artifactId>
+			<version>${dependency.brigadier.version}</version>
+		</dependency>
 	</dependencies>
 </project>

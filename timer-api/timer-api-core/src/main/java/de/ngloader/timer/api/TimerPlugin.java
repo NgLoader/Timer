@@ -3,8 +3,12 @@ package de.ngloader.timer.api;
 import java.util.Set;
 import java.util.UUID;
 
+import de.ngloader.timer.api.command.TimerCommandManager;
 import de.ngloader.timer.api.config.ConfigService;
 import de.ngloader.timer.api.database.TimerDatabaseManager;
+import de.ngloader.timer.api.i18n.TimerLanguageService;
+import de.ngloader.timer.api.i18n.TimerMessage;
+import de.ngloader.timer.api.i18n.TimerModule;
 import de.ngloader.timer.api.timer.Timer;
 import de.ngloader.timer.api.timer.TimerManager;
 
@@ -26,7 +30,9 @@ public abstract class TimerPlugin {
 	}
 
 	public abstract ConfigService getConfigService();
+	public abstract TimerLanguageService getLanguageService();
 	public abstract TimerDatabaseManager getDatabaseManager();
+	public abstract TimerCommandManager getCommandManager();
 
 	public abstract boolean addManager(TimerManager manager);
 	public abstract boolean removeManager(TimerManager manager);
@@ -42,6 +48,7 @@ public abstract class TimerPlugin {
 	public abstract void sendChatCommand(String message, String permission);
 	public abstract void sendConsoleCommand(String message);
 
-	public abstract void log(String module, String message);
-	public abstract void logError(String module, String message, Throwable... throwable);
+	protected abstract void log(String message);
+	public abstract void log(TimerModule module, TimerMessage message, Object... args);
+	public abstract void logError(TimerModule module, String message, Throwable... throwable);
 }

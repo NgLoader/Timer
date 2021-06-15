@@ -3,11 +3,12 @@ package de.ngloader.timer.core.database;
 import java.util.Objects;
 import java.util.Set;
 
-import de.ngloader.timer.api.TimerConfig;
 import de.ngloader.timer.api.TimerPlugin;
 import de.ngloader.timer.api.database.TimerDatabase;
 import de.ngloader.timer.api.database.TimerDatabaseManager;
 import de.ngloader.timer.api.database.TimerDatabaseType;
+import de.ngloader.timer.api.i18n.TimerMessage;
+import de.ngloader.timer.api.i18n.TimerModule;
 import de.ngloader.timer.api.timer.Timer;
 import de.ngloader.timer.api.timer.TimerManager;
 
@@ -18,12 +19,10 @@ public class ImplTimerDatabaseManager implements TimerDatabaseManager {
 
 	public ImplTimerDatabaseManager(TimerPlugin plugin) {
 		this.plugin = plugin;
-
-		this.setDatabase(plugin.getConfigService().getConfig(TimerConfig.class).databaseType);
 	}
 
 	private TimerDatabase createDatabase(TimerDatabaseType type) {
-		if (type == this.database.getType()) {
+		if (this.database != null && type == this.database.getType()) {
 			return this.database;
 		}
 
@@ -64,21 +63,21 @@ public class ImplTimerDatabaseManager implements TimerDatabaseManager {
 				return;
 			}
 
-			this.plugin.log("Database", "Storing timers to database§8.");
+			this.plugin.log(TimerModule.MODULE_DATABASE, TimerMessage.DATABASE_STORING_TIMERS_TO_DATABASE);
 			manager.getTimers().forEach(this.database::updateTimer);
-			this.plugin.log("Database", "Closing database connection§8.");
+			this.plugin.log(TimerModule.MODULE_DATABASE, TimerMessage.DATABASE_CLOSING_DATABASE_CONNECTION);
 			this.database.closeConnection();
-			this.plugin.log("Database", "Closed database connection§8.");
+			this.plugin.log(TimerModule.MODULE_DATABASE, TimerMessage.DATABASE_CLOSED_DATABASE_CONNECTION);
 			manager.getTimers().forEach(manager::removeTimer);
-			this.plugin.log("Database", "Removed all timers§8.");
+			this.plugin.log(TimerModule.MODULE_DATABASE, TimerMessage.DATABASE_REMOVED_ALL_TIMERS);
 		} finally {
 			this.database = database;
-			this.plugin.log("Database", "Opening database connection§8.");
+			this.plugin.log(TimerModule.MODULE_DATABASE, TimerMessage.DATABASE_OPENING_DATABASE_CONNECTION);
 			this.database.openConnection();
-			this.plugin.log("Database", "Opened database connection§8.");
-			this.plugin.log("Database", "Loading timers§8.");
+			this.plugin.log(TimerModule.MODULE_DATABASE, TimerMessage.DATABASE_OPENED_DATABASE_CONNECTION);
+			this.plugin.log(TimerModule.MODULE_DATABASE, TimerMessage.DATABASE_LOADING_TIMER);
 			this.database.getTimer().forEach(manager::addTimer);
-			this.plugin.log("Database", "Loaded §8" + manager.getTimers().size() + " §7timer§8.");
+			this.plugin.log(TimerModule.MODULE_DATABASE, TimerMessage.DATABASE_LOADED_TIMER, manager.getTimers().size());
 		}
 	}
 
@@ -95,10 +94,10 @@ public class ImplTimerDatabaseManager implements TimerDatabaseManager {
 		Objects.requireNonNull(from, "Database from is null");
 		Objects.requireNonNull(to, "Database to is null");
 
-		this.plugin.log("Database", "Converting timers from §8\"§e" + from.getType().name() + "§8\" §8to §8\"§e" + to.getType().name() + "§8\"§8.");
+		this.plugin.log(TimerModule.MODULE_DATABASE, TimerMessage.DATABASE_CONVERTING_TIMERS_FROM_TO, from.getType().name(), to.getType().name());
 		from.openConnection();
 		Set<Timer> timers = from.getTimer();
-		this.plugin.log("Database", "Found §e" + timers.size() + " §7timer§8.");
+		this.plugin.log(TimerModule.MODULE_DATABASE, TimerMessage.DATABASE_FOUND_TIMER, timers.size());
 		from.closeConnection();
 
 		to.openConnection();
@@ -106,7 +105,7 @@ public class ImplTimerDatabaseManager implements TimerDatabaseManager {
 		if (to.getType() != this.database.getType()) {
 			to.closeConnection();
 		}
-		this.plugin.log("Database", "Copied §e" + timers.size() + " §7timer§8.");
-		this.plugin.log("Database", "Converting finished.");
+		this.plugin.log(TimerModule.MODULE_DATABASE, TimerMessage.DATABASE_COPIED_TIMER, timers.size());
+		this.plugin.log(TimerModule.MODULE_DATABASE, TimerMessage.DATABASE_CONVERTING_FINISHED);
 	}
 }

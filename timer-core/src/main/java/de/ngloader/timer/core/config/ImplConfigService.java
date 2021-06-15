@@ -21,6 +21,7 @@ import de.ngloader.timer.api.TimerPlugin;
 import de.ngloader.timer.api.config.Config;
 import de.ngloader.timer.api.config.ConfigService;
 import de.ngloader.timer.api.config.TypeAdapter;
+import de.ngloader.timer.api.i18n.TimerModule;
 
 public class ImplConfigService implements ConfigService {
 
@@ -57,7 +58,7 @@ public class ImplConfigService implements ConfigService {
 
 		Config annotation = configClass.getDeclaredAnnotation(Config.class);
 		if (annotation == null) {
-			this.plugin.logError("ConfigService", String.format("'%s' has not the annotation '%s'", configClass.getSimpleName(), Config.class.getSimpleName()));
+			this.plugin.logError(TimerModule.MODULE_CONFIG_SERVICE, String.format("'%s' has not the annotation '%s'", configClass.getSimpleName(), Config.class.getSimpleName()));
 			return;
 		}
 
@@ -70,11 +71,11 @@ public class ImplConfigService implements ConfigService {
 					T instance = configClass.getDeclaredConstructor().newInstance();
 					this.gson.toJson(instance, bufferedWriter);
 				} catch (Exception e) {
-					this.plugin.logError("ConfigService", String.format("Failed to write file '%s'", annotation.path()), e);
+					this.plugin.logError(TimerModule.MODULE_CONFIG_SERVICE, String.format("Failed to write file '%s'", this.getPath(annotation)), e);
 					return;
 				}
 			} catch (IOException e) {
-				this.plugin.logError("ConfigService", String.format("Failed to create config '%s'", configClass.getSimpleName()), e);
+				this.plugin.logError(TimerModule.MODULE_CONFIG_SERVICE, String.format("Failed to create config '%s'", configClass.getSimpleName()), e);
 				return;
 			}
 		}
@@ -82,14 +83,14 @@ public class ImplConfigService implements ConfigService {
 		try (BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
 			T config = this.gson.fromJson(reader, configClass);
 			if (config == null) {
-				this.plugin.logError("ConfigService", String.format("Error by reading json file '%s'", annotation.path()));
+				this.plugin.logError(TimerModule.MODULE_CONFIG_SERVICE, String.format("Error by reading json file '%s'", this.getPath(annotation)));
 				return;
 			}
 
 			this.lock.writeLock().lock();
 			this.configs.put(configClass, config);
 		} catch (Exception e) {
-			this.plugin.logError("ConfigService", String.format("Error loading file '%s'", annotation.path()), e);
+			this.plugin.logError(TimerModule.MODULE_CONFIG_SERVICE, String.format("Error loading file '%s'", this.getPath(annotation)), e);
 		} finally {
 			this.lock.writeLock().unlock();
 		}
@@ -108,13 +109,13 @@ public class ImplConfigService implements ConfigService {
 		Objects.requireNonNull(config, "Config is null");
 
 		Config annotation = getConfigSettings(config.getClass());
-		Path path = Paths.get(annotation.path());
+		Path path = this.getPath(annotation);
 
 		if (Files.notExists(path)) {
 			try {
 				Files.createDirectories(path.getParent());
 			} catch (IOException e) {
-				this.plugin.logError("ConfigService", String.format("Failed to config directory '%s'", annotation.path()), e);
+				this.plugin.logError(TimerModule.MODULE_CONFIG_SERVICE, String.format("Failed to config directory '%s'", this.getPath(annotation)), e);
 				return;
 			}
 		}
@@ -122,7 +123,7 @@ public class ImplConfigService implements ConfigService {
 		try (BufferedWriter bufferedWriter = Files.newBufferedWriter(path, StandardCharsets.UTF_8, StandardOpenOption.CREATE)) {
 			this.gson.toJson(config, bufferedWriter);
 		} catch (IOException e) {
-			this.plugin.logError("ConfigService", String.format("Failed to write file '%s'", annotation.path()), e);
+			this.plugin.logError(TimerModule.MODULE_CONFIG_SERVICE, String.format("Failed to write file '%s'", this.getPath(annotation)), e);
 		}
 	}
 
@@ -190,7 +191,7 @@ public class ImplConfigService implements ConfigService {
 
 		Config config = configClass.getDeclaredAnnotation(Config.class);
 		if (config == null) {
-			this.plugin.logError("ConfigService", String.format("'%s' has not the annotation '%s'", configClass.getSimpleName(), Config.class.getSimpleName()));
+			this.plugin.logError(TimerModule.MODULE_CONFIG_SERVICE, String.format("'%s' has not the annotation '%s'", configClass.getSimpleName(), Config.class.getSimpleName()));
 			return null;
 		}
 		return config;
@@ -200,7 +201,7 @@ public class ImplConfigService implements ConfigService {
 	public Path getPath(Config config) {
 		Objects.requireNonNull(config, "Config is null");
 
-		return Paths.get(String.format("./plugins/%s/%s.json", config.path(), config.name()));
+		return Paths.get(String.format("./plugins/%s/%s.json", config.folder(), config.path().isEmpty() ? config.name() : config.path() + "/" + config.name()));
 	}
 
 	@Override
