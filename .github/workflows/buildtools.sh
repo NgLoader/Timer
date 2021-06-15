@@ -1,5 +1,4 @@
-# Author
-# Imprex-Development
+# Author: Imprex-Development
 # https://github.com/Imprex-Development/Orebfuscator/blob/master/.github/workflows/buildtools.sh
 
 build () {
