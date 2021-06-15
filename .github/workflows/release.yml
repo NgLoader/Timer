@@ -16,7 +16,7 @@ jobs:
     - name: Set up JDK
       uses: actions/setup-java@v1
       with:
-        java-version: '1.8'
+        java-version: '8'
         distribution: 'adopt'
         server-id: github
         server-username: GITHUB_USER_REF
