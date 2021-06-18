@@ -1,5 +1,6 @@
 package de.ngloader.timer.bukkit;
 
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -28,6 +29,8 @@ public class BukkitTimerPlugin extends JavaPlugin implements CommandExecutor {
 
 	@Override
 	public void onEnable() {
+		new Metrics(this, 11707);
+
 		this.task = Bukkit.getScheduler().runTaskTimer(this, this.bridge.getDefaultManager(), 0, 0);
 
 		CommandDispatcher<TimerCommandInfo> dispatcher = this.bridge.getCommandManager().getCommandDispatcher();

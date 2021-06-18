@@ -12,7 +12,7 @@ import de.ngloader.timer.api.i18n.TimerModule;
 import de.ngloader.timer.api.timer.Timer;
 import de.ngloader.timer.api.timer.TimerManager;
 
-//protected static functions implemented in java 9 but we use java 8
+//protected static interface functions implemented in java 9 but we need to use java 8
 public abstract class TimerPlugin {
 
 	private static TimerPlugin plugin;

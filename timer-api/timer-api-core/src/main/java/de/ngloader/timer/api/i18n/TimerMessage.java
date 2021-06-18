@@ -27,6 +27,11 @@ public enum TimerMessage {
 	DATABASE_COPIED_TIMER("§7Copied §e{0} §7timer§8."),
 	DATABASE_CONVERTING_FINISHED("§7Converting finished§8."),
 
+	COMMAND_CONTENT_START("§8[]§7=====§8<>§7=====§6< §eTypes §6>§7=====§8<>§7=====§8[]"),
+	COMMAND_CONTENT_END("§8[]§7=====§8<>§7=====§6< §eTypes §6>§7=====§8<>§7=====§8[]"),
+	COMMAND_TYPE_ENTRY("  §8- §e{0}"),
+	COMMMAND_TYPE_SYNTAX("§8/§atimer §etypes §8<§eAction§7|§eMessage§7|§eSort§7|§eStop§8>"),
+
 	COMMAND_UNKOWN_SYNTAX("§7Unknown syntax§8.");
 
 	public static Map<TimerMessage, String> toMap() {
