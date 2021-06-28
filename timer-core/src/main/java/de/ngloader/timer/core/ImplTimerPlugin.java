@@ -49,10 +49,6 @@ public abstract class ImplTimerPlugin extends TimerPlugin {
 		this.languageService.load();
 		this.databaseManager.setDatabase(this.configService.getConfig(TimerConfig.class).databaseType);
 
-		this.log(TimerModule.MODULE_CORE, TimerMessage.CORE_LOADING_TIMER);
-		this.databaseManager.getDatabase().getTimer().forEach(this.getDefaultManager()::addTimer);
-		this.log(TimerModule.MODULE_CORE, TimerMessage.CORE_LOADED_TIMER, this.defaultManager.getTimers().size());
-
 		this.log(TimerModule.MODULE_CORE, TimerMessage.CORE_LOADED);
 	}
 

@@ -10,6 +10,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 import de.ngloader.timer.api.TimerPlugin;
+import de.ngloader.timer.api.config.Exclude;
 import de.ngloader.timer.api.timer.Timer;
 import de.ngloader.timer.api.timer.TimerManager;
 import de.ngloader.timer.api.timer.TimerTickable;
@@ -21,10 +22,13 @@ import de.ngloader.timer.api.timer.stop.TimerStop;
 
 public class ImplTimer implements Timer {
 
+	@Exclude
 	private final TimerPlugin plugin;
-	private final UUID id;
 
+	@Exclude
 	private TimerManager timerManager;
+
+	private final UUID id;
 
 	private String name;
 	private boolean enabled = false;
@@ -38,6 +42,17 @@ public class ImplTimer implements Timer {
 
 	private long currentTick;
 	private long maxTick;
+
+	public ImplTimer(TimerPlugin plugin, TimerManager timerManager, ImplTimer timer) {
+		this(plugin, timerManager, timer.id, timer.name, timer.enabled);
+		this.actionType = timer.actionType;
+		this.stopType = timer.stopType;
+		this.sortType = timer.sortType;
+		this.messages = timer.messages;
+		this.tickables = timer.tickables;
+		this.currentTick = timer.currentTick;
+		this.maxTick = timer.maxTick;
+	}
 
 	public ImplTimer(TimerPlugin plugin, TimerManager timerManager, UUID id, String name, boolean enabled) {
 		this.plugin = plugin;

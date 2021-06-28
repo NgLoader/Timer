@@ -8,23 +8,15 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
-import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.mojang.brigadier.tree.CommandNode;
-
-import de.ngloader.timer.api.command.TimerCommandInfo;
-
 public class BukkitTimerPlugin extends JavaPlugin implements CommandExecutor {
 
 	private BukkitTimerBridge bridge;
-	private BrigadierAdapter brigadier;
 
 	private BukkitTask task;
 
 	@Override
 	public void onLoad() {
 		this.bridge = new BukkitTimerBridge();
-		this.brigadier = new BrigadierAdapter();
 	}
 
 	@Override
@@ -32,15 +24,6 @@ public class BukkitTimerPlugin extends JavaPlugin implements CommandExecutor {
 		new Metrics(this, 11707);
 
 		this.task = Bukkit.getScheduler().runTaskTimer(this, this.bridge.getDefaultManager(), 0, 0);
-
-		CommandDispatcher<TimerCommandInfo> dispatcher = this.bridge.getCommandManager().getCommandDispatcher();
-		LiteralArgumentBuilder<TimerCommandInfo> argumentBuilder = LiteralArgumentBuilder.literal("timer");
-
-		for (CommandNode<TimerCommandInfo> node : dispatcher.getRoot().getChildren()) {
-			argumentBuilder.then((CommandNode<TimerCommandInfo>) node);
-		}
-
-		this.brigadier.register(this.getCommand("timer"), argumentBuilder.build());
 	}
 
 	@Override

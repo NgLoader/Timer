@@ -36,6 +36,16 @@ public class ImplTimerManager implements TimerManager {
 	}
 
 	@Override
+	public Timer getTimer(String name) {
+		for (Timer timer : this.timers) {
+			if (timer.getName().equalsIgnoreCase(name)) {
+				return timer;
+			}
+		}
+		return null;
+	}
+
+	@Override
 	public Set<Timer> getTimers() {
 		return Collections.unmodifiableSet(this.timers);
 	}

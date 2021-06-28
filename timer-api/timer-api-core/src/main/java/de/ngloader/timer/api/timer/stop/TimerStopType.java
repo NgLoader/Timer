@@ -21,10 +21,24 @@ public enum TimerStopType {
 		return null;
 	}
 
+	public static TimerStopType search(String name) {
+		name = name.toLowerCase();
+
+		for (TimerStopType type : values()) {
+			if (type.className.startsWith(name)) {
+				return type;
+			}
+		}
+		return null;
+	}
+
 	private final Class<? extends TimerStop> classType;
+	private final String className;
 
 	private TimerStopType(Class<? extends TimerStop> clazzType) {
 		this.classType = clazzType;
+
+		this.className = this.classType.getSimpleName().toLowerCase();
 	}
 
 	public Class<? extends TimerStop> getClassType() {

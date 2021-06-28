@@ -17,10 +17,24 @@ public enum TimerSortType {
 		return null;
 	}
 
+	public static TimerSortType search(String name) {
+		name = name.toLowerCase();
+
+		for (TimerSortType type : values()) {
+			if (type.className.startsWith(name)) {
+				return type;
+			}
+		}
+		return null;
+	}
+
 	private final Class<? extends TimerSort> classType;
+	private final String className;
 
 	private TimerSortType(Class<? extends TimerSort> clazzType) {
 		this.classType = clazzType;
+
+		this.className = this.classType.getSimpleName().toLowerCase();
 	}
 
 	public Class<? extends TimerSort> getClassType() {

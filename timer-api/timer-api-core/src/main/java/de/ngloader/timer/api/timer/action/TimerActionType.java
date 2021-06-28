@@ -17,10 +17,24 @@ public enum TimerActionType {
 		return null;
 	}
 
+	public static TimerActionType search(String name) {
+		name = name.toLowerCase();
+
+		for (TimerActionType type : values()) {
+			if (type.className.startsWith(name)) {
+				return type;
+			}
+		}
+		return null;
+	}
+
 	private final Class<? extends TimerAction> classType;
+	private final String className;
 
 	private TimerActionType(Class<? extends TimerAction> clazzType) {
 		this.classType = clazzType;
+
+		this.className = this.classType.getSimpleName().toLowerCase();
 	}
 
 	public Class<? extends TimerAction> getClassType() {

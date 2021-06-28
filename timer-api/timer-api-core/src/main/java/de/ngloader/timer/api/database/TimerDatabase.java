@@ -8,6 +8,7 @@ public interface TimerDatabase {
 
 	public void openConnection();
 	public void closeConnection();
+	public boolean isConnected();
 
 	public Set<Timer> getTimer();
 

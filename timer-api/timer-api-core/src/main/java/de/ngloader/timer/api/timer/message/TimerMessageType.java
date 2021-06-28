@@ -19,10 +19,24 @@ public enum TimerMessageType {
 		return null;
 	}
 
+	public static TimerMessageType search(String name) {
+		name = name.toLowerCase();
+
+		for (TimerMessageType type : values()) {
+			if (type.className.startsWith(name)) {
+				return type;
+			}
+		}
+		return null;
+	}
+
 	private final Class<? extends TimerMessage> classType;
+	private final String className;
 
 	private TimerMessageType(Class<? extends TimerMessage> clazzType) {
 		this.classType = clazzType;
+
+		this.className = this.classType.getSimpleName().toLowerCase();
 	}
 
 	public Class<? extends TimerMessage> getClassType() {

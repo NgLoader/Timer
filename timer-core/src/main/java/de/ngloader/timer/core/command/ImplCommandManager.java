@@ -1,6 +1,10 @@
 package de.ngloader.timer.core.command;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -8,7 +12,7 @@ import java.util.function.Predicate;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.tree.CommandNode;
+import com.mojang.brigadier.tree.LiteralCommandNode;
 
 import de.ngloader.timer.api.TimerPlugin;
 import de.ngloader.timer.api.command.TimerArgumentBuilder;
@@ -19,62 +23,72 @@ import de.ngloader.timer.api.command.TimerCommandResponse;
 import de.ngloader.timer.api.i18n.TimerLanguageService;
 import de.ngloader.timer.api.i18n.TimerMessage;
 import de.ngloader.timer.api.i18n.TimerModule;
+import de.ngloader.timer.core.StringUtil;
 
 public class ImplCommandManager implements TimerCommandManager {
 
 	private final TimerPlugin plugin;
+	private final TimerLanguageService languageService;
 
 	private final CommandDispatcher<TimerCommandInfo> commandDispatcher = new CommandDispatcher<>();
 
+	private final Map<String, TimerCommand> commandByAlias = new HashMap<>();
+	private final Map<TimerCommand, Set<String>> aliasByCommand = new HashMap<>();
+
 	public ImplCommandManager(TimerPlugin plugin) {
 		this.plugin = plugin;
+		this.languageService = this.plugin.getLanguageService();
 
-		this.registerCommand(CommandAdd.class, CommandAdd.COMMAND);
-		this.registerCommand(CommandCmd.class, CommandCmd.COMMAND);
-		this.registerCommand(CommandEdit.class, CommandEdit.COMMAND);
-		this.registerCommand(CommandInfo.class, CommandInfo.COMMAND);
-		this.registerCommand(CommandList.class, CommandList.COMMAND);
-		this.registerCommand(CommandLoad.class, CommandLoad.COMMAND);
-		this.registerCommand(CommandReload.class, CommandReload.COMMAND);
-		this.registerCommand(CommandSave.class, CommandSave.COMMAND);
-		this.registerCommand(CommandType.class, CommandType.COMMAND);
-		this.registerCommand(CommandHelp.class, CommandHelp.COMMAND);
+		this.registerCommand(new CommandAction());
+		this.registerCommand(new CommandAdd());
+		this.registerCommand(new CommandType());
+		this.registerCommand(new CommandHelp());
 	}
 
 	@Override
-	public void registerCommand(Class<?> clazz, LiteralArgumentBuilder<TimerCommandInfo> command) {
+	public void registerCommand(TimerCommand command) {
 		Objects.requireNonNull(command, "Command is null");
 
-		this.registerCommand(clazz.getAnnotation(TimerCommand.class), command);
-	}
+		LiteralCommandNode<TimerCommandInfo> node = this.commandDispatcher.register(command.getCommandBuilder());
+		this.addCommand(command, node.getLiteral().toLowerCase());
 
-	@Override
-	public void registerCommand(TimerCommand annotation, LiteralArgumentBuilder<TimerCommandInfo> command) {
-		Objects.requireNonNull(command, "Command is null");
+		for (String alias : command.getAliases()) {
+			this.addCommand(command, alias);
 
-		CommandNode<TimerCommandInfo> node = this.commandDispatcher.register(command);
-
-		if (annotation != null) {
-			for (String alias : annotation.aliases()) {
-				if (alias.isEmpty()) {
-					continue;
-				}
-
-				LiteralArgumentBuilder<TimerCommandInfo> aliasBuilder = TimerArgumentBuilder.literal(alias)
-						.executes(node.getCommand())
-						.redirect(node);
-				this.commandDispatcher.register(aliasBuilder);
-			}
+			LiteralArgumentBuilder<TimerCommandInfo> aliasBuilder = TimerArgumentBuilder.literal(alias)
+					.executes(node.getCommand())
+					.redirect(node);
+			this.commandDispatcher.register(aliasBuilder);
 		}
+	}
+
+	private void addCommand(TimerCommand command, String alias) {
+		this.commandByAlias.put(alias, command);
+
+		if (alias == null || alias.isEmpty()) {
+			return;
+		}
+
+		Set<String> aliases = this.aliasByCommand.get(command);
+		if (aliases == null) {
+			aliases = new HashSet<>();
+			this.aliasByCommand.put(command, aliases);
+		}
+		aliases.add(alias);
 	}
 
 	@Override
 	public boolean executeCommand(String[] args, Predicate<String> permission, Consumer<String> response) {
 		return this.executeCommand(args, new TimerCommandInfo() {
+
+			@Override
+			public TimerPlugin getPlugin() {
+				return ImplCommandManager.this.plugin;
+			}
 			
 			@Override
 			public BiConsumer<TimerMessage, Object[]> response() {
-				TimerLanguageService languageService = ImplCommandManager.this.plugin.getLanguageService();
+				TimerLanguageService languageService = ImplCommandManager.this.languageService;
 				return (message, args) -> response.accept(languageService.getPrefix() + languageService.translate(message, args));
 			}
 			
@@ -97,6 +111,14 @@ public class ImplCommandManager implements TimerCommandManager {
 			case TimerCommandResponse.HELP:
 				return this.executeCommand(args.length > 0 ? new String[] { "help", args[0] } : new String[] { "help" }, commandInfo);
 
+			case TimerCommandResponse.PERMISSION:
+				TimerCommand command = this.getCommand(args);
+				commandInfo.response(TimerMessage.COMMAND_NO_PERMISSION, StringUtil.toFirstUpper(command != null ? command.getCommandBuilder().getLiteral() : ""));
+				return true;
+
+			case TimerCommandResponse.SYNTAX:
+				return this.sendSyntaxMessage(args, commandInfo);
+
 			case TimerCommandResponse.ERROR:
 				this.plugin.logError(TimerModule.MODULE_COMMAND, "Error by executing command §c" + String.join(" ", args) + "§8! §cPlease §4report §cthis to the projekt maintainer§8.!");
 				return false;
@@ -106,9 +128,32 @@ public class ImplCommandManager implements TimerCommandManager {
 				return false;
 			}
 		} catch (CommandSyntaxException e) {
-			commandInfo.response(TimerMessage.COMMAND_UNKOWN_SYNTAX);
-			return false;
+			return this.sendSyntaxMessage(args, commandInfo);
 		}
+	}
+
+	private TimerCommand getCommand(String[] args) {
+		return this.commandByAlias.get(args.length > 0 ? args[0] : "");
+	}
+
+	private boolean sendSyntaxMessage(String[] args, TimerCommandInfo commandInfo) {
+		TimerCommand command = this.getCommand(args);
+		if (command != null && command.getSyntaxMessage() != null) {
+			commandInfo.response(command.getSyntaxMessage());
+			return true;
+		}
+		commandInfo.response(TimerMessage.COMMAND_UNKOWN_SYNTAX);
+		return false;
+	}
+
+	@Override
+	public Set<String> getAliases(TimerCommand command) {
+		return this.aliasByCommand.get(command);
+	}
+
+	@Override
+	public TimerCommand getCommand(String command) {
+		return this.commandByAlias.get(command.toLowerCase());
 	}
 
 	@Override

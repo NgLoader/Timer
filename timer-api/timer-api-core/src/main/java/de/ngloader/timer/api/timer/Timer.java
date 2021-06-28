@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import de.ngloader.timer.api.TimerPlugin;
+import de.ngloader.timer.api.i18n.TimerModule;
 import de.ngloader.timer.api.timer.action.TimerAction;
 import de.ngloader.timer.api.timer.action.TimerActionType;
 import de.ngloader.timer.api.timer.message.TimerMessage;
@@ -29,20 +30,32 @@ public interface Timer extends Runnable {
 
 	public TimerAction getActionType();
 	public void setActionType(TimerAction type);
-	public default void setActionType(TimerActionType type) throws Exception {
-		this.setActionType(TimerType.newInstance(this, type.getClassType()));
+	public default void setActionType(TimerActionType type) {
+		try {
+			this.setActionType(TimerType.newInstance(this, type.getClassType()));
+		} catch (Exception e) {
+			this.getPlugin().logError(TimerModule.MODULE_COMMAND, "Error by execution command (setActionType)", e);
+		}
 	}
 
 	public TimerStop getStopType();
 	public void setStopType(TimerStop type);
-	public default void setStopType(TimerStopType type) throws Exception {
-		this.setStopType(TimerType.newInstance(this, type.getClassType()));
+	public default void setStopType(TimerStopType type) {
+		try {
+			this.setStopType(TimerType.newInstance(this, type.getClassType()));
+		} catch (Exception e) {
+			this.getPlugin().logError(TimerModule.MODULE_COMMAND, "Error by execution command (setStopType)", e);
+		}
 	}
 
 	public TimerSort getSortType();
 	public void setSortType(TimerSort type);
-	public default void setSortType(TimerSortType type) throws Exception {
-		this.setSortType(TimerType.newInstance(this, type.getClassType()));
+	public default void setSortType(TimerSortType type) {
+		try {
+			this.setSortType(TimerType.newInstance(this, type.getClassType()));
+		} catch (Exception e) {
+			this.getPlugin().logError(TimerModule.MODULE_COMMAND, "Error by execution command (setSortType)", e);
+		}
 	}
 
 	public List<TimerMessage> getMessages();
