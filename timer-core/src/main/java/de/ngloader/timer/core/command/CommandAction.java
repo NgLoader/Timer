@@ -33,42 +33,46 @@ public class CommandAction implements TimerCommand {
 								argument("type", greedyString())
 								.executes(command -> {
 									TimerCommandInfo commandInfo = command.getSource();
-									if (!commandInfo.isDatabaseConnected(true)) {
-										return TimerCommandResponse.OK;
-									}
-
-									TimerPlugin plugin = commandInfo.getPlugin();
-									TimerManager manager = plugin.getDefaultManager();
-
 									String name = getString(command, "name");
-									Timer timer = manager.getTimer(name);
-
-									if (timer != null ?
-											!commandInfo.hasOnePermission(
-												"timer.action.*",
-												"timer.action." + timer.getName().toLowerCase()) :
-											!commandInfo.hasPermission("timer.action.*")) {
-										return TimerCommandResponse.PERMISSION;
-									}
-
-									if (manager.getTimer(name) == null) {
-										commandInfo.response(TimerMessage.COMMAND_ACTION_TIMER_NOT_FOUND, name);
-										return TimerCommandResponse.OK;
-									}
-
 									String type = getString(command, "type");
-									TimerActionType actionType = TimerActionType.search(type);
-									if (actionType == null) {
-										commandInfo.response(TimerMessage.COMMAND_ACTION_ACTION_NOT_FOUND, type);
-										return TimerCommandResponse.OK;
-									}
-
-									timer.setActionType(actionType);
-									commandInfo.response(TimerMessage.COMMAND_ACTION_CHANGED, timer.getName(), StringUtil.toFirstUpper(type));
-									return TimerCommandResponse.OK;
+									return this.handleActionNameType(commandInfo, name, type);
 								})
 						)
 				);
+	}
+
+	public int handleActionNameType(TimerCommandInfo commandInfo, String name, String type) {
+		if (!commandInfo.isDatabaseConnected(true)) {
+			return TimerCommandResponse.OK;
+		}
+
+		TimerPlugin plugin = commandInfo.getPlugin();
+		TimerManager manager = plugin.getDefaultManager();
+
+		Timer timer = manager.getTimer(name);
+
+		if (timer != null ?
+				!commandInfo.hasOnePermission(
+					"timer.action.*",
+					"timer.action." + timer.getName().toLowerCase()) :
+				!commandInfo.hasPermission("timer.action.*")) {
+			return TimerCommandResponse.PERMISSION;
+		}
+
+		if (manager.getTimer(name) == null) {
+			commandInfo.response(TimerMessage.COMMAND_ACTION_TIMER_NOT_FOUND, name);
+			return TimerCommandResponse.OK;
+		}
+
+		TimerActionType actionType = TimerActionType.search(type);
+		if (actionType == null) {
+			commandInfo.response(TimerMessage.COMMAND_ACTION_ACTION_NOT_FOUND, type);
+			return TimerCommandResponse.OK;
+		}
+
+		timer.setActionType(actionType);
+		commandInfo.response(TimerMessage.COMMAND_ACTION_CHANGED, timer.getName(), StringUtil.toFirstUpper(type));
+		return TimerCommandResponse.OK;
 	}
 
 	@Override

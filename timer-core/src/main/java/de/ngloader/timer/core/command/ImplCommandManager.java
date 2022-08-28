@@ -122,14 +122,15 @@ public class ImplCommandManager implements TimerCommandManager {
 			case TimerCommandResponse.ERROR:
 				this.plugin.logError(TimerModule.MODULE_COMMAND, "Error by executing command §c" + String.join(" ", args) + "§8! §cPlease §4report §cthis to the projekt maintainer§8.!");
 				return false;
-
-			default:
-				this.plugin.logError(TimerModule.MODULE_COMMAND, "Error by executing command §c" + String.join(" ", args) + " §7returned unknown code§8! §cPlease §4report §cthis to the projekt maintainer§8.!");
-				return false;
 			}
 		} catch (CommandSyntaxException e) {
 			return this.sendSyntaxMessage(args, commandInfo);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
+
+		this.plugin.logError(TimerModule.MODULE_COMMAND, "Error by executing command §c" + String.join(" ", args) + " §7returned unknown code§8! §cPlease §4report §cthis to the projekt maintainer§8.!");
+		return false;
 	}
 
 	private TimerCommand getCommand(String[] args) {

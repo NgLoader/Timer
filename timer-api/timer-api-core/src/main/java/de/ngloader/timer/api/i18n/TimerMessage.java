@@ -54,6 +54,9 @@ public enum TimerMessage {
 	COMMAND_ACTION_DESCRIPTION("description"),
 	COMMAND_ACTION_SYNTAX("syntax"),
 
+	COMMAND_EDIT_DESCRIPTION("description"),
+	COMMAND_EDIT_SYNTAX("syntax"),
+
 	COMMAND_NO_PERMISSION(""),
 	COMMAND_UNKOWN_SYNTAX("§7Unknown syntax§8.");
 

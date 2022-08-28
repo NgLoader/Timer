@@ -29,25 +29,28 @@ public class CommandHelp implements TimerCommand {
 						.executes(command -> {
 							TimerCommandInfo commandInfo = command.getSource();
 							String input = getString(command, "command");
-		
-							TimerCommandManager commandManager = commandInfo.getPlugin().getCommandManager();
-							TimerCommand found = commandManager.getCommand(input);
-							if (found == null) {
-								commandInfo.response(TimerMessage.COMMAND_HELP_NOT_FOUND, input);
-								return TimerCommandResponse.OK;
-							}
-		
-							commandInfo.response(TimerMessage.COMMAND_HELP_START);
-							commandInfo.response(TimerMessage.COMMAND_HELP_ENTRY_NAME, input.substring(0, 1).toUpperCase() + input.substring(1).toLowerCase());
-							commandInfo.response(TimerMessage.COMMAND_HELP_ENTRY_DESCRIPTION, commandInfo.translate(found.getDescriptionMessage()));
-							commandInfo.response(TimerMessage.COMMAND_HELP_ENTRY_ALIASES, String.join(", ", commandManager.getAliases(found)));
-							commandInfo.response(TimerMessage.COMMAND_HELP_ENTRY_SYNTAX, commandInfo.translate(found.getSyntaxMessage()));
-							commandInfo.response(TimerMessage.COMMAND_HELP_END);
-							return TimerCommandResponse.OK;
+							return this.handleHelpCommand(commandInfo, input);
 						})
 				).executes(command -> {
 					return TimerCommandResponse.SYNTAX;
 				});
+	}
+
+	public int handleHelpCommand(TimerCommandInfo commandInfo, String command) {
+		TimerCommandManager commandManager = commandInfo.getPlugin().getCommandManager();
+		TimerCommand found = commandManager.getCommand(command);
+		if (found == null) {
+			commandInfo.response(TimerMessage.COMMAND_HELP_NOT_FOUND, command);
+			return TimerCommandResponse.OK;
+		}
+
+		commandInfo.response(TimerMessage.COMMAND_HELP_START);
+		commandInfo.response(TimerMessage.COMMAND_HELP_ENTRY_NAME, command.substring(0, 1).toUpperCase() + command.substring(1).toLowerCase());
+		commandInfo.response(TimerMessage.COMMAND_HELP_ENTRY_DESCRIPTION, commandInfo.translate(found.getDescriptionMessage()));
+		commandInfo.response(TimerMessage.COMMAND_HELP_ENTRY_ALIASES, String.join(", ", commandManager.getAliases(found)));
+		commandInfo.response(TimerMessage.COMMAND_HELP_ENTRY_SYNTAX, commandInfo.translate(found.getSyntaxMessage()));
+		commandInfo.response(TimerMessage.COMMAND_HELP_END);
+		return TimerCommandResponse.OK;
 	}
 
 	@Override

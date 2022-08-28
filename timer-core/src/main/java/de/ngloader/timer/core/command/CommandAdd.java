@@ -31,30 +31,33 @@ public class CommandAdd implements TimerCommand {
 						argument("name", greedyString())
 						.executes(command -> {
 							TimerCommandInfo commandInfo = command.getSource();
-							if (!commandInfo.isDatabaseConnected(true)) {
-								return TimerCommandResponse.OK;
-							}
-
-							TimerPlugin plugin = commandInfo.getPlugin();
-							TimerManager manager = plugin.getDefaultManager();
-
 							String name = getString(command, "name");
-
-							if (manager.getTimer(name) != null) {
-								commandInfo.response(TimerMessage.COMMAND_ADD_NAME_ALREADY_TAKEN, name);
-								return TimerCommandResponse.OK;
-							}
-
-							Timer timer = new ImplTimer(plugin, manager, plugin.generateUUID(), name, false);
-							plugin.getDatabaseManager().getDatabase().createTimer(timer);
-							manager.addTimer(timer);
-
-							commandInfo.response(TimerMessage.COMMAND_ADD_ADDED, name);
-							return TimerCommandResponse.OK;
+							return this.handleAddName(commandInfo, name);
 						})
 				).executes(command -> {
 					return TimerCommandResponse.SYNTAX;
 				});
+	}
+
+	public int handleAddName(TimerCommandInfo commandInfo, String name) {
+		if (!commandInfo.isDatabaseConnected(true)) {
+			return TimerCommandResponse.OK;
+		}
+
+		TimerPlugin plugin = commandInfo.getPlugin();
+		TimerManager manager = plugin.getDefaultManager();
+
+		if (manager.getTimer(name) != null) {
+			commandInfo.response(TimerMessage.COMMAND_ADD_NAME_ALREADY_TAKEN, name);
+			return TimerCommandResponse.OK;
+		}
+
+		Timer timer = new ImplTimer(plugin, manager, plugin.generateUUID(), name, false);
+		plugin.getDatabaseManager().getDatabase().createTimer(timer);
+		manager.addTimer(timer);
+
+		commandInfo.response(TimerMessage.COMMAND_ADD_ADDED, name);
+		return TimerCommandResponse.OK;
 	}
 
 	@Override
