@@ -19,22 +19,22 @@ import de.ngloader.timer.api.TimerPlugin;
 import de.ngloader.timer.api.config.ConfigService;
 import de.ngloader.timer.api.database.TimerDatabase;
 import de.ngloader.timer.api.database.TimerDatabaseType;
-import de.ngloader.timer.api.database.config.DatabaseConfigJson;
+import de.ngloader.timer.api.database.config.DatabaseConfigLocal;
 import de.ngloader.timer.api.i18n.TimerModule;
 import de.ngloader.timer.api.timer.Timer;
 import de.ngloader.timer.core.timer.ImplTimer;
 
-public class ImplTimerDatabaseJson implements TimerDatabase {
+public class ImplTimerDatabaseLocal implements TimerDatabase {
 
 	private final TimerPlugin plugin;
 	private final ConfigService configService;
-	private final DatabaseConfigJson config;
+	private final DatabaseConfigLocal config;
 	private boolean open = false;
 
-	public ImplTimerDatabaseJson(TimerPlugin plugin) {
+	public ImplTimerDatabaseLocal(TimerPlugin plugin) {
 		this.plugin = plugin;
 		this.configService = this.plugin.getConfigService();
-		this.config = this.configService.getConfig(DatabaseConfigJson.class);
+		this.config = this.configService.getConfig(DatabaseConfigLocal.class);
 	}
 
 	@Override
@@ -65,12 +65,12 @@ public class ImplTimerDatabaseJson implements TimerDatabase {
 				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
 					if (file.toString().endsWith(".json")) {
 						try (BufferedReader bufferedReader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
-							ImplTimer timer = ImplTimerDatabaseJson.this.configService.getGson().fromJson(bufferedReader, ImplTimer.class);
-							TimerPlugin plugin = ImplTimerDatabaseJson.this.plugin;
+							ImplTimer timer = ImplTimerDatabaseLocal.this.configService.getGson().fromJson(bufferedReader, ImplTimer.class);
+							TimerPlugin plugin = ImplTimerDatabaseLocal.this.plugin;
 
 							timers.add(new ImplTimer(plugin, plugin.getDefaultManager(), timer));
 						} catch (IOException e) {
-							ImplTimerDatabaseJson.this.plugin.logError(TimerModule.MODULE_DATABASE, e.getMessage(), e);
+							ImplTimerDatabaseLocal.this.plugin.logError(TimerModule.MODULE_DATABASE, e.getMessage(), e);
 						}
 					}
 					return FileVisitResult.CONTINUE;
@@ -157,7 +157,7 @@ public class ImplTimerDatabaseJson implements TimerDatabase {
 
 	@Override
 	public TimerDatabaseType getType() {
-		return TimerDatabaseType.JSON;
+		return TimerDatabaseType.LOCAL;
 	}
 
 	@Override

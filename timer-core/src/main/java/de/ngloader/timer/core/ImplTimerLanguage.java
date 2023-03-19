@@ -1,4 +1,4 @@
-package de.ngloader.timer.core.i18n;
+package de.ngloader.timer.core;
 
 import java.text.MessageFormat;
 import java.util.HashMap;

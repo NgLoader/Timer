@@ -5,13 +5,18 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.ParseResults;
+import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 
 import de.ngloader.timer.api.TimerPlugin;
@@ -23,9 +28,12 @@ import de.ngloader.timer.api.command.TimerCommandResponse;
 import de.ngloader.timer.api.i18n.TimerLanguageService;
 import de.ngloader.timer.api.i18n.TimerMessage;
 import de.ngloader.timer.api.i18n.TimerModule;
-import de.ngloader.timer.core.StringUtil;
+import de.ngloader.timer.core.command.edit.CommandEdit;
+import de.ngloader.timer.core.util.StringUtil;
 
 public class ImplCommandManager implements TimerCommandManager {
+
+	private static Suggestions suggestionEmpty = new SuggestionsBuilder("", 0).build();
 
 	private final TimerPlugin plugin;
 	private final TimerLanguageService languageService;
@@ -43,6 +51,7 @@ public class ImplCommandManager implements TimerCommandManager {
 		this.registerCommand(new CommandAdd());
 		this.registerCommand(new CommandType());
 		this.registerCommand(new CommandHelp());
+		this.registerCommand(new CommandEdit());
 	}
 
 	@Override
@@ -78,6 +87,43 @@ public class ImplCommandManager implements TimerCommandManager {
 	}
 
 	@Override
+	public boolean executeCommand(String[] args, TimerCommandInfo commandInfo) {
+		try {
+			int code = this.commandDispatcher.execute(String.join(" ", args), commandInfo);
+
+			switch (code) {
+			case TimerCommandResponse.OK:
+				return true;
+
+			case TimerCommandResponse.HELP:
+				return this.executeCommand(args.length > 0 ? new String[] { "help", args[0] } : new String[] { "help" }, commandInfo);
+
+			case TimerCommandResponse.PERMISSION:
+				TimerCommand command = this.getCommand(args);
+				commandInfo.response(TimerMessage.COMMAND_NO_PERMISSION, StringUtil.toFirstUpper(command != null ? command.getCommandBuilder().getLiteral() : ""));
+				return true;
+
+			case TimerCommandResponse.SYNTAX:
+				return this.sendSyntaxMessage(args, commandInfo);
+
+			case TimerCommandResponse.ERROR:
+				this.plugin.logError(TimerModule.MODULE_COMMAND, "Error by executing command §8\"§c" + String.join(" ", args) + "§8\"§8! §cPlease §4report §cthis to the projekt maintainer§8.!");
+
+				command = this.getCommand(args);
+				commandInfo.response(TimerMessage.COMMAND_ERROR_OCCURED, String.join(" ", args));
+				return false;
+			}
+		} catch (CommandSyntaxException e) {
+			return this.sendSyntaxMessage(args, commandInfo);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		this.plugin.logError(TimerModule.MODULE_COMMAND, "Error by executing command §8\"§c" + String.join(" ", args) + "§8\" §7returned unknown code§8! §cPlease §4report §cthis to the projekt maintainer§8.!");
+		return false;
+	}
+
+	@Override
 	public boolean executeCommand(String[] args, Predicate<String> permission, Consumer<String> response) {
 		return this.executeCommand(args, new TimerCommandInfo() {
 
@@ -100,37 +146,48 @@ public class ImplCommandManager implements TimerCommandManager {
 	}
 
 	@Override
-	public boolean executeCommand(String[] args, TimerCommandInfo commandInfo) {
-		try {
-			int code = this.commandDispatcher.execute(String.join(" ", args), commandInfo);
-
-			switch (code) {
-			case TimerCommandResponse.OK:
-				return true;
-
-			case TimerCommandResponse.HELP:
-				return this.executeCommand(args.length > 0 ? new String[] { "help", args[0] } : new String[] { "help" }, commandInfo);
-
-			case TimerCommandResponse.PERMISSION:
-				TimerCommand command = this.getCommand(args);
-				commandInfo.response(TimerMessage.COMMAND_NO_PERMISSION, StringUtil.toFirstUpper(command != null ? command.getCommandBuilder().getLiteral() : ""));
-				return true;
-
-			case TimerCommandResponse.SYNTAX:
-				return this.sendSyntaxMessage(args, commandInfo);
-
-			case TimerCommandResponse.ERROR:
-				this.plugin.logError(TimerModule.MODULE_COMMAND, "Error by executing command §c" + String.join(" ", args) + "§8! §cPlease §4report §cthis to the projekt maintainer§8.!");
-				return false;
-			}
-		} catch (CommandSyntaxException e) {
-			return this.sendSyntaxMessage(args, commandInfo);
-		} catch (Exception e) {
-			e.printStackTrace();
+	public Suggestions onTabComplete(String[] args, TimerCommandInfo commandInfo) {
+		StringReader cursor = new StringReader(String.join(" ", args));
+		if (cursor.canRead() && cursor.peek() == '/') {
+			cursor.skip();
 		}
 
-		this.plugin.logError(TimerModule.MODULE_COMMAND, "Error by executing command §c" + String.join(" ", args) + " §7returned unknown code§8! §cPlease §4report §cthis to the projekt maintainer§8.!");
-		return false;
+		try {
+			ParseResults<TimerCommandInfo> parseResults = this.commandDispatcher.parse(cursor, commandInfo);
+			Suggestions suggestions = this.commandDispatcher.getCompletionSuggestions(parseResults).get();
+			if (suggestions == null || suggestions.isEmpty()) {
+				return suggestionEmpty;
+			}
+
+			return suggestions;
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			return suggestionEmpty;
+		}
+
+		return suggestionEmpty;
+	}
+
+	@Override
+	public Suggestions onTabComplete(String[] args, Predicate<String> permission) {
+		return this.onTabComplete(args, new TimerCommandInfo() {
+
+			@Override
+			public TimerPlugin getPlugin() {
+				return ImplCommandManager.this.plugin;
+			}
+			
+			@Override
+			public BiConsumer<TimerMessage, Object[]> response() {
+				return null;
+			}
+			
+			@Override
+			public Predicate<String> hasPermission() {
+				return permission;
+			}
+		});
 	}
 
 	private TimerCommand getCommand(String[] args) {

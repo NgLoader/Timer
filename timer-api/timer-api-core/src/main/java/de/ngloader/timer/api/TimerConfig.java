@@ -5,5 +5,5 @@ import de.ngloader.timer.api.database.TimerDatabaseType;
 
 @Config(name = "config")
 public class TimerConfig {
-	public TimerDatabaseType databaseType = TimerDatabaseType.JSON;
+	public TimerDatabaseType databaseType = TimerDatabaseType.LOCAL;
 }

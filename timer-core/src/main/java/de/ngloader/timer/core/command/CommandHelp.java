@@ -12,6 +12,7 @@ import de.ngloader.timer.api.command.TimerCommandInfo;
 import de.ngloader.timer.api.command.TimerCommandManager;
 import de.ngloader.timer.api.command.TimerCommandResponse;
 import de.ngloader.timer.api.i18n.TimerMessage;
+import de.ngloader.timer.core.util.SuggestionUtil;
 
 public class CommandHelp implements TimerCommand {
 
@@ -26,6 +27,7 @@ public class CommandHelp implements TimerCommand {
 				.requires(info -> info.hasPermission("timer.help"))
 				.then(
 						argument("command", word())
+						.suggests(SuggestionUtil.SUGGEST_COMMAND_ROOT)
 						.executes(command -> {
 							TimerCommandInfo commandInfo = command.getSource();
 							String input = getString(command, "command");

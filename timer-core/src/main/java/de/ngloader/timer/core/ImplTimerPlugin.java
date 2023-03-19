@@ -21,7 +21,6 @@ import de.ngloader.timer.api.timer.TimerManager;
 import de.ngloader.timer.core.command.ImplCommandManager;
 import de.ngloader.timer.core.config.ImplConfigService;
 import de.ngloader.timer.core.database.ImplTimerDatabaseManager;
-import de.ngloader.timer.core.i18n.ImplTimerLanguage;
 import de.ngloader.timer.core.timer.ImplTimerManager;
 
 public abstract class ImplTimerPlugin extends TimerPlugin {
@@ -73,7 +72,7 @@ public abstract class ImplTimerPlugin extends TimerPlugin {
 		UUID uuid;
 		do {
 			uuid = UUID.randomUUID();
-		} while(this.existTimer(uuid));
+		} while (this.existTimer(uuid));
 		return uuid;
 	}
 

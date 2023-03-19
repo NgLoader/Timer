@@ -1,4 +1,4 @@
-package de.ngloader.timer.core;
+package de.ngloader.timer.core.util;
 
 import java.util.regex.Pattern;
 

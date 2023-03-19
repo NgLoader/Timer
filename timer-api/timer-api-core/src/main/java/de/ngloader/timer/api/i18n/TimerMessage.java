@@ -25,6 +25,8 @@ public enum TimerMessage {
 	DATABASE_COPIED_TIMER("§7Copied §e{0} §7timer§8."),
 	DATABASE_CONVERTING_FINISHED("§7Converting finished§8."),
 
+	COMMAND_TIMER_NOT_FOUND("Timer {0} not found"),
+
 	COMMAND_DATABASE_IS_NOT_CONNECTED("§7Currently no database connection is §copen§8!"),
 
 	COMMAND_TYPE_START("§8[]§7=====§8<>§7=====§6< §eTypes §6>§7=====§8<>§7=====§8[]"),
@@ -49,7 +51,6 @@ public enum TimerMessage {
 	COMMAND_HELP_SYNTAX("§8/§atimer §ehelp §8[§ecommand§8]"),
 
 	COMMAND_ACTION_CHANGED("Timer {0} action changed to {1}"),
-	COMMAND_ACTION_TIMER_NOT_FOUND("Timer {0} not found"),
 	COMMAND_ACTION_ACTION_NOT_FOUND("Action {0} not found"),
 	COMMAND_ACTION_DESCRIPTION("description"),
 	COMMAND_ACTION_SYNTAX("syntax"),
@@ -57,7 +58,8 @@ public enum TimerMessage {
 	COMMAND_EDIT_DESCRIPTION("description"),
 	COMMAND_EDIT_SYNTAX("syntax"),
 
-	COMMAND_NO_PERMISSION(""),
+	COMMAND_NO_PERMISSION("§7You don't have the following permission §8\"§c{0}§8\""),
+	COMMAND_ERROR_OCCURED("§cA error occured by executing the following command §8\"{0}§8\""),
 	COMMAND_UNKOWN_SYNTAX("§7Unknown syntax§8.");
 
 	public static Map<TimerMessage, String> toMap() {

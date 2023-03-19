@@ -1,41 +1,27 @@
 package de.ngloader.timer.core.command.edit;
 
-import java.util.concurrent.CompletableFuture;
+import static de.ngloader.timer.api.command.TimerArgumentBuilder.argument;
+import static de.ngloader.timer.api.command.TimerArgumentBuilder.literal;
+import static de.ngloader.timer.api.command.TimerArgumentBuilder.string;
 
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.suggestion.Suggestions;
-import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import com.mojang.brigadier.builder.ArgumentBuilder;
 
 import de.ngloader.timer.api.command.TimerCommandInfo;
 import de.ngloader.timer.api.command.TimerCommandResponse;
-import de.ngloader.timer.core.RegexUtil;
+import de.ngloader.timer.core.util.SuggestionUtil;
 
 public class CommandEditTime {
 
+	public static final ArgumentBuilder<TimerCommandInfo, ?> COMMAND = literal("time")
+			.then(literal("current")
+					.then(argument("time", string())
+							.executes(context -> {
+								return 0;
+							})
+							.suggests(SuggestionUtil.SUGGEST_TIME_INPUT)))
+			.then(literal("max"));
+
 	public static int handle(TimerCommandInfo commandInfo, String command) {
 		return TimerCommandResponse.OK;
-	}
-
-	public static CompletableFuture<Suggestions> suggest(CommandContext<TimerCommandInfo> command,
-			SuggestionsBuilder builder) {
-		String input = builder.getInput();
-		String lastLetter = input.isBlank() ? "" : input.substring(input.length() - 1);
-
-		if (RegexUtil.INTEGER.matches(lastLetter)) {
-			builder
-				.suggest("Year")
-				.suggest("Month")
-				.suggest("Week")
-				.suggest("Hour")
-				.suggest("Minute")
-				.suggest("Second")
-				.suggest("Tick");
-		} else {
-			for (int i = 0; i < 9; i++) {
-				builder.suggest(i);
-			}
-		}
-
-		return builder.buildFuture();
 	}
 }

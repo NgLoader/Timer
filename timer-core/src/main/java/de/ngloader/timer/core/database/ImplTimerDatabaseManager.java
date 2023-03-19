@@ -7,6 +7,9 @@ import de.ngloader.timer.api.TimerPlugin;
 import de.ngloader.timer.api.database.TimerDatabase;
 import de.ngloader.timer.api.database.TimerDatabaseManager;
 import de.ngloader.timer.api.database.TimerDatabaseType;
+import de.ngloader.timer.api.database.config.DatabaseConfigLocal;
+import de.ngloader.timer.api.database.config.DatabaseConfigMongoDB;
+import de.ngloader.timer.api.database.config.DatabaseConfigMySQL;
 import de.ngloader.timer.api.i18n.TimerMessage;
 import de.ngloader.timer.api.i18n.TimerModule;
 import de.ngloader.timer.api.timer.Timer;
@@ -26,9 +29,13 @@ public class ImplTimerDatabaseManager implements TimerDatabaseManager {
 			return this.database;
 		}
 
+		this.plugin.getConfigService().loadConfig(DatabaseConfigLocal.class);
+		this.plugin.getConfigService().loadConfig(DatabaseConfigMongoDB.class);
+		this.plugin.getConfigService().loadConfig(DatabaseConfigMySQL.class);
+
 		switch (type) {
-		case JSON:
-			return new ImplTimerDatabaseJson(this.plugin);
+		case LOCAL:
+			return new ImplTimerDatabaseLocal(this.plugin);
 
 		case MONGODB:
 			return null;

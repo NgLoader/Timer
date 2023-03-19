@@ -15,7 +15,7 @@ import de.ngloader.timer.api.i18n.TimerMessage;
 import de.ngloader.timer.api.timer.Timer;
 import de.ngloader.timer.api.timer.TimerManager;
 import de.ngloader.timer.api.timer.action.TimerActionType;
-import de.ngloader.timer.core.StringUtil;
+import de.ngloader.timer.core.util.StringUtil;
 
 public class CommandAction implements TimerCommand {
 
@@ -60,7 +60,7 @@ public class CommandAction implements TimerCommand {
 		}
 
 		if (manager.getTimer(name) == null) {
-			commandInfo.response(TimerMessage.COMMAND_ACTION_TIMER_NOT_FOUND, name);
+			commandInfo.response(TimerMessage.COMMAND_TIMER_NOT_FOUND, name);
 			return TimerCommandResponse.OK;
 		}
 
