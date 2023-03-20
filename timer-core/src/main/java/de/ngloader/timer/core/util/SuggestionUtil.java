@@ -80,6 +80,54 @@ public class SuggestionUtil {
 		return builder.buildFuture();
 	};
 
+	public static final Long suggestTimeInput(String input) {
+		long ticks = 0;
+
+		String time = "";
+		String type = "";
+
+		for (int i = 0; i < input.length(); i++) {
+			String character = String.valueOf(input.charAt(i));
+
+			if (RegexUtil.INTEGER.matches(character)) {
+				if (type.length() == 0) {
+					time += character;
+					continue;
+				}
+			} else if (time.isBlank() && type.isBlank()) {
+				return null; // invalid
+			} else {
+				type += character;
+				continue;
+			}
+
+			TimeMapper resultType = TimeMapper.suggestFirst(type);
+			if (resultType == null) {
+				return null; // invalid
+			}
+
+			ticks += resultType.getTicks() * Integer.valueOf(time);
+
+			time = character;
+			type = "";
+		}
+
+		if (time.length() != 0) {
+			if (type.length() != 0) {
+				TimeMapper resultType = TimeMapper.suggestFirst(type);
+				if (resultType == null) {
+					return null; // invalid
+				}
+
+				ticks += resultType.getTicks() * Integer.valueOf(time);
+			} else {
+				ticks += TimeMapper.SECOND.getTicks() * Integer.valueOf(time);
+			}
+		}
+
+		return ticks;
+	}
+
 	private static final CompletableFuture<Suggestions> compareSuggest(SuggestionsBuilder builder, Stream<String> values) {
 		return compareSuggest(builder, values.toArray(String[]::new));
 	}
