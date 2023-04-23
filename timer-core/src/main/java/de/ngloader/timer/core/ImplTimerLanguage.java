@@ -9,7 +9,6 @@ import java.util.function.Function;
 import de.ngloader.timer.api.TimerPlugin;
 import de.ngloader.timer.api.i18n.TimerConfigTranslation;
 import de.ngloader.timer.api.i18n.TimerLanguageService;
-import de.ngloader.timer.api.i18n.TimerMessage;
 import de.ngloader.timer.api.i18n.TimerModule;
 
 public class ImplTimerLanguage implements TimerLanguageService {
@@ -18,7 +17,7 @@ public class ImplTimerLanguage implements TimerLanguageService {
 
 	private String prefix;
 	private Map<TimerModule, String> modules = new HashMap<>();
-	private Map<TimerMessage, String> messages = new HashMap<>();
+	private Map<TimerMessageOLD, String> messages = new HashMap<>();
 
 	public ImplTimerLanguage(TimerPlugin plugin) {
 		this.plugin = plugin;
@@ -26,12 +25,12 @@ public class ImplTimerLanguage implements TimerLanguageService {
 
 	@Override
 	public void load() {
-		this.plugin.log(TimerModule.MODULE_I18N, TimerMessage.CORE_LOADING_TRANSLATION);
+		this.plugin.log(TimerModule.MODULE_I18N, TimerMessageOLD.CORE_LOADING_TRANSLATION);
 
 		TimerConfigTranslation config = this.plugin.getConfigService().getConfig(TimerConfigTranslation.class);
 		String prefix = config.prefix;
 		Map<TimerModule, String> modules = config.modules != null ? new HashMap<>(config.modules) : new HashMap<>();
-		Map<TimerMessage, String> messages = config.messages != null ? new HashMap<>(config.messages) : new HashMap<>();
+		Map<TimerMessageOLD, String> messages = config.messages != null ? new HashMap<>(config.messages) : new HashMap<>();
 
 		boolean update = false;
 		if (prefix == null) {
@@ -45,7 +44,7 @@ public class ImplTimerLanguage implements TimerLanguageService {
 	
 			update = true;
 		}
-		if (this.loadMessages(messages, TimerMessage.values(), (module -> module.getMessage()))) {
+		if (this.loadMessages(messages, TimerMessageOLD.values(), (module -> module.getMessage()))) {
 			config.messages = messages;
 	
 			update = true;
@@ -55,11 +54,11 @@ public class ImplTimerLanguage implements TimerLanguageService {
 			this.plugin.getConfigService().saveConfig(config);
 		}
 
-		this.prefix = prefix;
+		this.prefix = prefix.replace("&", "§");
 		this.modules = modules;
 		this.messages = messages;
 
-		this.plugin.log(TimerModule.MODULE_I18N, TimerMessage.CORE_LOADED_TRANSLATION, this.messages.size());
+		this.plugin.log(TimerModule.MODULE_I18N, TimerMessageOLD.CORE_LOADED_TRANSLATION, this.messages.size());
 	}
 
 	private <T extends Enum<T>> boolean loadMessages(Map<T, String> messages, T[] values, Function<T, String> translate) {
@@ -75,7 +74,7 @@ public class ImplTimerLanguage implements TimerLanguageService {
 
 	@Override
 	public String getPrefix() {
-		return this.prefix != null ? this.prefix.replace("&", "§") : TimerConfigTranslation.PREFIX;
+		return this.prefix != null ? this.prefix : TimerConfigTranslation.PREFIX;
 	}
 
 	@Override
@@ -86,7 +85,7 @@ public class ImplTimerLanguage implements TimerLanguageService {
 	}
 
 	@Override
-	public String translate(TimerMessage message, Object... args) {
+	public String translate(TimerMessageOLD message, Object... args) {
 		Objects.requireNonNull(message, "Translation key is null");
 
 		return MessageFormat.format(this.messages.getOrDefault(message, message.getMessage()).replace("&", "§"), args);

@@ -11,7 +11,7 @@ import de.ngloader.timer.api.command.TimerCommand;
 import de.ngloader.timer.api.command.TimerCommandInfo;
 import de.ngloader.timer.api.command.TimerCommandManager;
 import de.ngloader.timer.api.command.TimerCommandResponse;
-import de.ngloader.timer.api.i18n.TimerMessage;
+import de.ngloader.timer.core.TimerMessageOLD;
 import de.ngloader.timer.core.util.SuggestionUtil;
 
 public class CommandHelp implements TimerCommand {
@@ -42,26 +42,26 @@ public class CommandHelp implements TimerCommand {
 		TimerCommandManager commandManager = commandInfo.getPlugin().getCommandManager();
 		TimerCommand found = commandManager.getCommand(command);
 		if (found == null) {
-			commandInfo.response(TimerMessage.COMMAND_HELP_NOT_FOUND, command);
+			commandInfo.response(TimerMessageOLD.COMMAND_HELP_NOT_FOUND, command);
 			return TimerCommandResponse.OK;
 		}
 
-		commandInfo.response(TimerMessage.COMMAND_HELP_START);
-		commandInfo.response(TimerMessage.COMMAND_HELP_ENTRY_NAME, command.substring(0, 1).toUpperCase() + command.substring(1).toLowerCase());
-		commandInfo.response(TimerMessage.COMMAND_HELP_ENTRY_DESCRIPTION, commandInfo.translate(found.getDescriptionMessage()));
-		commandInfo.response(TimerMessage.COMMAND_HELP_ENTRY_ALIASES, String.join(", ", commandManager.getAliases(found)));
-		commandInfo.response(TimerMessage.COMMAND_HELP_ENTRY_SYNTAX, commandInfo.translate(found.getSyntaxMessage()));
-		commandInfo.response(TimerMessage.COMMAND_HELP_END);
+		commandInfo.response(TimerMessageOLD.COMMAND_HELP_START);
+		commandInfo.response(TimerMessageOLD.COMMAND_HELP_ENTRY_NAME, command.substring(0, 1).toUpperCase() + command.substring(1).toLowerCase());
+		commandInfo.response(TimerMessageOLD.COMMAND_HELP_ENTRY_DESCRIPTION, commandInfo.translate(found.getDescriptionMessage()));
+		commandInfo.response(TimerMessageOLD.COMMAND_HELP_ENTRY_ALIASES, String.join(", ", commandManager.getAliases(found)));
+		commandInfo.response(TimerMessageOLD.COMMAND_HELP_ENTRY_SYNTAX, commandInfo.translate(found.getSyntaxMessage()));
+		commandInfo.response(TimerMessageOLD.COMMAND_HELP_END);
 		return TimerCommandResponse.OK;
 	}
 
 	@Override
-	public TimerMessage getDescriptionMessage() {
-		return TimerMessage.COMMAND_HELP_DESCRIPTION;
+	public TimerMessageOLD getDescriptionMessage() {
+		return TimerMessageOLD.COMMAND_HELP_DESCRIPTION;
 	}
 
 	@Override
-	public TimerMessage getSyntaxMessage() {
-		return TimerMessage.COMMAND_HELP_SYNTAX;
+	public TimerMessageOLD getSyntaxMessage() {
+		return TimerMessageOLD.COMMAND_HELP_SYNTAX;
 	}
 }

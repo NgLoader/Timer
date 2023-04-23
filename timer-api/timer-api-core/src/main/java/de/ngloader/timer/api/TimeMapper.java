@@ -1,34 +1,35 @@
 package de.ngloader.timer.api;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public enum TimeMapper {
 
 	TICK	(
-			20,
-			1),
+			20, // Tick
+			1), // In ticks
 	SECOND	(
-			60,
-			20),
+			60, 	// Second
+			20), 	// In ticks
 	MINUTE	(
-			60,
-			20 * 60),
+			60, 		// Minute
+			20 * 60), 	// In ticks
 	HOUR	(
-			24,
-			20 * 60 * 60),
-	DAY		(
-			7,
-			20 * 60 * 60 * 24),
+			24, 			// Hour
+			20 * 60 * 60), 	// In ticks
+	DAY 	(
+			7, 					// Day
+			20 * 60 * 60 * 24), // In ticks
 	WEEK	(
-			4,
-			20 * 60 * 60 * 24 * 7),
+			4, 						// Week
+			20 * 60 * 60 * 24 * 7), // In ticks
 	MONTH	(
-			12,
-			20 * 60 * 60 * 24 * 7 * 4),
+			12, 						// Month
+			20 * 60 * 60 * 24 * 7 * 4), // In ticks
 	YEAR	(
-			365,
-			20 * 60 * 60 * 24 * 7 * 4 * 12);
+			365, 								// Year
+			20 * 60 * 60 * 24 * 7 * 4 * 12); 	// In ticks
 
 	private static final String DEFAULT_SPLITTER = " ";
 
@@ -68,13 +69,16 @@ public enum TimeMapper {
 	public static List<TimeMapper> suggest(String input) {
 		input = input.toLowerCase();
 
-		List<TimeMapper> result = new ArrayList<>();
+		List<TimeMapper> result = null;
 		for (TimeMapper time : values()) {
 			if (time.name().toLowerCase().startsWith(input)) {
+				if (result == null) {
+					result = new ArrayList<>();
+				}
 				result.add(time);
 			}
 		}
-		return result;
+		return result != null ? result : Collections.emptyList();
 	}
 
 	private final long part;

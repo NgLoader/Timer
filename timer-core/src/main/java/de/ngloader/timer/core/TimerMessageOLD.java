@@ -1,9 +1,9 @@
-package de.ngloader.timer.api.i18n;
+package de.ngloader.timer.core;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public enum TimerMessage {
+public enum TimerMessageOLD {
 
 	CORE_LOADING("§7Loading§8."),
 	CORE_LOADING_TRANSLATION("§7Loading translations§8."),
@@ -58,13 +58,27 @@ public enum TimerMessage {
 	COMMAND_EDIT_DESCRIPTION("description"),
 	COMMAND_EDIT_SYNTAX("syntax"),
 
+	/*
+	 * {0}: Input time as pretty string
+	 * {1}: Max Tick as pretty string
+	 */
+	COMMAND_EDIT_INPUT_IS_HIGHER_THAN_MAX_TICK("§7The current input §e{0} §7 is higher than the current max tick value §e{0}"),
+	/*
+	 * {0}: Current tick as pretty string
+	 */
+	COMMAND_EDIT_NEW_CURRENT_TICK_SET("§7The current tick was set to §e{0}"),
+	/*
+	 * {0}: Max tick as pretty string
+	 */
+	COMMAND_EDIT_NEW_MAX_TICK_SET("§7The max tick value was set to §e{0}"),
+
 	COMMAND_NO_PERMISSION("§7You don't have the following permission §8\"§c{0}§8\""),
 	COMMAND_ERROR_OCCURED("§cA error occured by executing the following command §8\"{0}§8\""),
 	COMMAND_UNKOWN_SYNTAX("§7Unknown syntax§8.");
 
-	public static Map<TimerMessage, String> toMap() {
-		Map<TimerMessage, String> messages = new HashMap<>();
-		for (TimerMessage message : values()) {
+	public static Map<TimerMessageOLD, String> toMap() {
+		Map<TimerMessageOLD, String> messages = new HashMap<>();
+		for (TimerMessageOLD message : values()) {
 			messages.put(message, message.getMessage());
 		}
 		return messages;
@@ -72,7 +86,7 @@ public enum TimerMessage {
 
 	private final String message;
 
-	private TimerMessage(String message) {
+	private TimerMessageOLD(String message) {
 		this.message = message;
 	}
 

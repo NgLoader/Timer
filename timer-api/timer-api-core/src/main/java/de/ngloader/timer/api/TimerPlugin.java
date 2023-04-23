@@ -7,12 +7,11 @@ import de.ngloader.timer.api.command.TimerCommandManager;
 import de.ngloader.timer.api.config.ConfigService;
 import de.ngloader.timer.api.database.TimerDatabaseManager;
 import de.ngloader.timer.api.i18n.TimerLanguageService;
-import de.ngloader.timer.api.i18n.TimerMessage;
 import de.ngloader.timer.api.i18n.TimerModule;
 import de.ngloader.timer.api.timer.Timer;
 import de.ngloader.timer.api.timer.TimerManager;
+import de.ngloader.timer.core.TimerMessageOLD;
 
-//protected static interface functions implemented in java 9 but we need to use java 8
 public abstract class TimerPlugin {
 
 	private static TimerPlugin plugin;
@@ -47,8 +46,4 @@ public abstract class TimerPlugin {
 	public abstract void sendChatMessage(String message, String permission);
 	public abstract void sendChatCommand(String message, String permission);
 	public abstract void sendConsoleCommand(String message);
-
-	protected abstract void log(String message);
-	public abstract void log(TimerModule module, TimerMessage message, Object... args);
-	public abstract void logError(TimerModule module, String message, Throwable... throwable);
 }

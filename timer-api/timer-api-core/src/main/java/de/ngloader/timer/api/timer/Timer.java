@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import de.ngloader.timer.api.TimerLogger;
 import de.ngloader.timer.api.TimerPlugin;
-import de.ngloader.timer.api.i18n.TimerModule;
 import de.ngloader.timer.api.timer.action.TimerAction;
 import de.ngloader.timer.api.timer.action.TimerActionType;
 import de.ngloader.timer.api.timer.message.TimerMessage;
@@ -34,7 +34,7 @@ public interface Timer extends Runnable {
 		try {
 			this.setActionType(TimerType.newInstance(this, type.getClassType()));
 		} catch (Exception e) {
-			this.getPlugin().logError(TimerModule.MODULE_COMMAND, "Error by execution command (setActionType)", e);
+			TimerLogger.error("Error by execution command (setActionType)", e);
 		}
 	}
 
@@ -44,7 +44,7 @@ public interface Timer extends Runnable {
 		try {
 			this.setStopType(TimerType.newInstance(this, type.getClassType()));
 		} catch (Exception e) {
-			this.getPlugin().logError(TimerModule.MODULE_COMMAND, "Error by execution command (setStopType)", e);
+			TimerLogger.error("Error by execution command (setStopType)", e);
 		}
 	}
 
@@ -54,7 +54,7 @@ public interface Timer extends Runnable {
 		try {
 			this.setSortType(TimerType.newInstance(this, type.getClassType()));
 		} catch (Exception e) {
-			this.getPlugin().logError(TimerModule.MODULE_COMMAND, "Error by execution command (setSortType)", e);
+			TimerLogger.error("Error by execution command (setSortType)", e);
 		}
 	}
 

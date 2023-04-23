@@ -14,12 +14,18 @@ import de.ngloader.timer.api.timer.Timer;
 public class CommandEditName {
 
 	public static final ArgumentBuilder<TimerCommandInfo, ?> COMMAND = literal("name")
+			.requires(commandInfo -> commandInfo.hasPermission("timer.edit.name"))
 			.then(argument("name", string())
 					.executes(context -> {
 						TimerCommandInfo commandInfo = context.getSource();
 						Timer timer = CommandEdit.getTimer(context, true);
 						if (timer == null) {
 							return TimerCommandResponse.OK;
+						}
+
+						String permission = String.format("timer.edit.%s.name", timer.getName().toLowerCase());
+						if (!commandInfo.hasAnyPermission("timer.edit.*.name", permission)) {
+							return TimerCommandResponse.PERMISSION;
 						}
 
 						String name = getString(context, "name");

@@ -80,7 +80,7 @@ public class SuggestionUtil {
 		return builder.buildFuture();
 	};
 
-	public static final Long suggestTimeInput(String input) {
+	public static final Long getSuggestedTime(String input) {
 		long ticks = 0;
 
 		String time = "";
@@ -126,6 +126,14 @@ public class SuggestionUtil {
 		}
 
 		return ticks;
+	}
+
+	public static SuggestionProvider<TimerCommandInfo> suggest(Class<? extends Enum<?>> enumClass) {
+		return (context, builder) -> compareSuggest(builder, Stream.of(enumClass.getEnumConstants()).map(value -> value.name()));
+	}
+
+	public static SuggestionProvider<TimerCommandInfo> suggest(String... values) {
+		return (context, builder) -> compareSuggest(builder, Stream.of(values));
 	}
 
 	private static final CompletableFuture<Suggestions> compareSuggest(SuggestionsBuilder builder, Stream<String> values) {

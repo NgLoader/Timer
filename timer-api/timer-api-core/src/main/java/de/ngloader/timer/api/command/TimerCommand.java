@@ -2,8 +2,6 @@ package de.ngloader.timer.api.command;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 
-import de.ngloader.timer.api.i18n.TimerMessage;
-
 public interface TimerCommand {
 
 	/**
@@ -17,6 +15,6 @@ public interface TimerCommand {
 
 	public LiteralArgumentBuilder<TimerCommandInfo> getCommandBuilder();
 
-	public TimerMessage getDescriptionMessage();
-	public TimerMessage getSyntaxMessage();
+	public String getDescriptionMessage();
+	public String getSyntaxMessage();
 }

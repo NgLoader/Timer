@@ -14,7 +14,6 @@ import de.ngloader.timer.api.database.TimerDatabase;
 import de.ngloader.timer.api.database.TimerDatabaseManager;
 import de.ngloader.timer.api.i18n.TimerConfigTranslation;
 import de.ngloader.timer.api.i18n.TimerLanguageService;
-import de.ngloader.timer.api.i18n.TimerMessage;
 import de.ngloader.timer.api.i18n.TimerModule;
 import de.ngloader.timer.api.timer.Timer;
 import de.ngloader.timer.api.timer.TimerManager;
@@ -36,7 +35,7 @@ public abstract class ImplTimerPlugin extends TimerPlugin {
 	public ImplTimerPlugin() {
 		TimerPlugin.setPlugin(this);
 
-		this.log(TimerModule.MODULE_CORE, TimerMessage.CORE_LOADING);
+		this.log(TimerModule.MODULE_CORE, TimerMessageOLD.CORE_LOADING);
 
 		this.configService = new ImplConfigService(this);
 		this.languageService = new ImplTimerLanguage(this);
@@ -48,11 +47,11 @@ public abstract class ImplTimerPlugin extends TimerPlugin {
 		this.languageService.load();
 		this.databaseManager.setDatabase(this.configService.getConfig(TimerConfig.class).databaseType);
 
-		this.log(TimerModule.MODULE_CORE, TimerMessage.CORE_LOADED);
+		this.log(TimerModule.MODULE_CORE, TimerMessageOLD.CORE_LOADED);
 	}
 
 	public void disable() {
-		this.log(TimerModule.MODULE_CORE, TimerMessage.CORE_DISABLING);
+		this.log(TimerModule.MODULE_CORE, TimerMessageOLD.CORE_DISABLING);
 
 		if (this.databaseManager != null && this.databaseManager.getDatabase() != null) {
 			TimerDatabase database = this.databaseManager.getDatabase();
@@ -64,7 +63,7 @@ public abstract class ImplTimerPlugin extends TimerPlugin {
 			database.closeConnection();
 		}
 
-		this.log(TimerModule.MODULE_CORE, TimerMessage.CORE_DISABLED);
+		this.log(TimerModule.MODULE_CORE, TimerMessageOLD.CORE_DISABLED);
 	}
 
 	@Override
@@ -110,7 +109,7 @@ public abstract class ImplTimerPlugin extends TimerPlugin {
 	}
 
 	@Override
-	public void log(TimerModule module, TimerMessage message, Object... args) {
+	public void log(TimerModule module, TimerMessageOLD message, Object... args) {
 		if (this.languageService == null) {
 			this.log(String.format("%s%s %s", TimerConfigTranslation.PREFIX, module.getMessage(), message.getMessage()));
 			return;

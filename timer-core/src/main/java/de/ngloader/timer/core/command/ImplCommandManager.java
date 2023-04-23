@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -25,18 +24,15 @@ import de.ngloader.timer.api.command.TimerCommand;
 import de.ngloader.timer.api.command.TimerCommandInfo;
 import de.ngloader.timer.api.command.TimerCommandManager;
 import de.ngloader.timer.api.command.TimerCommandResponse;
-import de.ngloader.timer.api.i18n.TimerLanguageService;
-import de.ngloader.timer.api.i18n.TimerMessage;
 import de.ngloader.timer.api.i18n.TimerModule;
+import de.ngloader.timer.core.TimerMessageOLD;
 import de.ngloader.timer.core.command.edit.CommandEdit;
-import de.ngloader.timer.core.util.StringUtil;
 
 public class ImplCommandManager implements TimerCommandManager {
 
 	private static Suggestions suggestionEmpty = new SuggestionsBuilder("", 0).build();
 
 	private final TimerPlugin plugin;
-	private final TimerLanguageService languageService;
 
 	private final CommandDispatcher<TimerCommandInfo> commandDispatcher = new CommandDispatcher<>();
 
@@ -45,7 +41,6 @@ public class ImplCommandManager implements TimerCommandManager {
 
 	public ImplCommandManager(TimerPlugin plugin) {
 		this.plugin = plugin;
-		this.languageService = this.plugin.getLanguageService();
 
 		this.registerCommand(new CommandAction());
 		this.registerCommand(new CommandAdd());
@@ -99,8 +94,9 @@ public class ImplCommandManager implements TimerCommandManager {
 				return this.executeCommand(args.length > 0 ? new String[] { "help", args[0] } : new String[] { "help" }, commandInfo);
 
 			case TimerCommandResponse.PERMISSION:
-				TimerCommand command = this.getCommand(args);
-				commandInfo.response(TimerMessage.COMMAND_NO_PERMISSION, StringUtil.toFirstUpper(command != null ? command.getCommandBuilder().getLiteral() : ""));
+//				TimerCommand command = this.getCommand(args);
+//				commandInfo.response(TimerMessage.COMMAND_NO_PERMISSION, StringUtil.toFirstUpper(command != null ? command.getCommandBuilder().getLiteral() : ""));
+				commandInfo.response(TimerMessageOLD.COMMAND_NO_PERMISSION, String.join(", ", commandInfo.failedPermissionCheck()));
 				return true;
 
 			case TimerCommandResponse.SYNTAX:
@@ -109,8 +105,8 @@ public class ImplCommandManager implements TimerCommandManager {
 			case TimerCommandResponse.ERROR:
 				this.plugin.logError(TimerModule.MODULE_COMMAND, "Error by executing command §8\"§c" + String.join(" ", args) + "§8\"§8! §cPlease §4report §cthis to the projekt maintainer§8.!");
 
-				command = this.getCommand(args);
-				commandInfo.response(TimerMessage.COMMAND_ERROR_OCCURED, String.join(" ", args));
+//				TimerCommand command = this.getCommand(args);
+				commandInfo.response(TimerMessageOLD.COMMAND_ERROR_OCCURED, String.join(" ", args));
 				return false;
 			}
 		} catch (CommandSyntaxException e) {
@@ -125,24 +121,25 @@ public class ImplCommandManager implements TimerCommandManager {
 
 	@Override
 	public boolean executeCommand(String[] args, Predicate<String> permission, Consumer<String> response) {
-		return this.executeCommand(args, new TimerCommandInfo() {
-
-			@Override
-			public TimerPlugin getPlugin() {
-				return ImplCommandManager.this.plugin;
-			}
-			
-			@Override
-			public BiConsumer<TimerMessage, Object[]> response() {
-				TimerLanguageService languageService = ImplCommandManager.this.languageService;
-				return (message, args) -> response.accept(languageService.getPrefix() + languageService.translate(message, args));
-			}
-			
-			@Override
-			public Predicate<String> hasPermission() {
-				return permission;
-			}
-		});
+		return this.executeCommand(args, new ImplTimerCommandInfo(this.plugin, permission, response));
+//		return this.executeCommand(args, new TimerCommandInfo() {
+//
+//			@Override
+//			public TimerPlugin getPlugin() {
+//				return ImplCommandManager.this.plugin;
+//			}
+//			
+//			@Override
+//			public BiConsumer<TimerMessage, Object[]> response() {
+//				TimerLanguageService languageService = ImplCommandManager.this.languageService;
+//				return (message, args) -> response.accept(languageService.getPrefix() + languageService.translate(message, args));
+//			}
+//			
+//			@Override
+//			public Predicate<String> hasPermission() {
+//				return permission;
+//			}
+//		});
 	}
 
 	@Override
@@ -171,23 +168,24 @@ public class ImplCommandManager implements TimerCommandManager {
 
 	@Override
 	public Suggestions onTabComplete(String[] args, Predicate<String> permission) {
-		return this.onTabComplete(args, new TimerCommandInfo() {
-
-			@Override
-			public TimerPlugin getPlugin() {
-				return ImplCommandManager.this.plugin;
-			}
-			
-			@Override
-			public BiConsumer<TimerMessage, Object[]> response() {
-				return null;
-			}
-			
-			@Override
-			public Predicate<String> hasPermission() {
-				return permission;
-			}
-		});
+		return this.onTabComplete(args, new ImplTimerCommandInfo(this.plugin, permission, null));
+//		return this.onTabComplete(args, new TimerCommandInfo() {
+//
+//			@Override
+//			public TimerPlugin getPlugin() {
+//				return ImplCommandManager.this.plugin;
+//			}
+//			
+//			@Override
+//			public BiConsumer<TimerMessage, Object[]> response() {
+//				return null;
+//			}
+//			
+//			@Override
+//			public Predicate<String> hasPermission() {
+//				return permission;
+//			}
+//		});
 	}
 
 	private TimerCommand getCommand(String[] args) {
@@ -200,7 +198,7 @@ public class ImplCommandManager implements TimerCommandManager {
 			commandInfo.response(command.getSyntaxMessage());
 			return true;
 		}
-		commandInfo.response(TimerMessage.COMMAND_UNKOWN_SYNTAX);
+		commandInfo.response(TimerMessageOLD.COMMAND_UNKOWN_SYNTAX);
 		return false;
 	}
 

@@ -1,11 +1,13 @@
 package de.ngloader.timer.api.command;
 
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
 import de.ngloader.timer.api.TimerPlugin;
 import de.ngloader.timer.api.database.TimerDatabase;
-import de.ngloader.timer.api.i18n.TimerMessage;
+import de.ngloader.timer.api.i18n.argument.LanguageArgument;
+import de.ngloader.timer.core.TimerMessageOLD;
 
 public interface TimerCommandInfo {
 
@@ -14,13 +16,20 @@ public interface TimerCommandInfo {
 	public Predicate<String> hasPermission();
 
 	/**
+	 * Return a list with all failed permission for the current request
+	 * 
+	 * @return failed permissions
+	 */
+	public Set<String> failedPermissionCheck();
+
+	/**
 	 * Return true when the permission is true
 	 * 
 	 * @param permission
 	 * @return has permission
 	 */
 	public default boolean hasPermission(String permission) {
-		return this.hasPermission().test(permission);
+		return this.hasPermission().test(permission);	
 	}
 
 	/**
@@ -44,7 +53,7 @@ public interface TimerCommandInfo {
 	 * @param permissions
 	 * @return has permission
 	 */
-	public default boolean hasOnePermission(String... permissions) {
+	public default boolean hasAnyPermission(String... permissions) {
 		for (String permission : permissions) {
 			if (this.hasPermission().test(permission)) {
 				return true;
@@ -53,7 +62,7 @@ public interface TimerCommandInfo {
 		return false;
 	}
 
-	public BiConsumer<TimerMessage, Object[]> response();
+	public BiConsumer<String, LanguageArgument[]> response();
 
 	/**
 	 * Response with a translated message
@@ -61,18 +70,18 @@ public interface TimerCommandInfo {
 	 * @param message
 	 * @param args
 	 */
-	public default void response(TimerMessage message, Object... args) {
+	public default void response(String message, LanguageArgument... args) {
 		this.response().accept(message, args);
 	}
 
 	/**
-	 * Translate a message
+	 * Receive a translated message
 	 * 
 	 * @param message
 	 * @param args
 	 * @return Translated message
 	 */
-	public default String translate(TimerMessage message, Object... args) {
+	public default String translate(String message, LanguageArgument... args) {
 		return this.getPlugin().getLanguageService().translate(message, args);
 	}
 
@@ -89,7 +98,7 @@ public interface TimerCommandInfo {
 		}
 
 		if (sendNotConnectedMessage) {
-			this.response(TimerMessage.COMMAND_DATABASE_IS_NOT_CONNECTED);
+			this.response(TimerMessageOLD.COMMAND_DATABASE_IS_NOT_CONNECTED);
 		}
 		return false;
 	}

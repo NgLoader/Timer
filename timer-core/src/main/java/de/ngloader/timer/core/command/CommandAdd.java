@@ -11,9 +11,9 @@ import de.ngloader.timer.api.TimerPlugin;
 import de.ngloader.timer.api.command.TimerCommand;
 import de.ngloader.timer.api.command.TimerCommandInfo;
 import de.ngloader.timer.api.command.TimerCommandResponse;
-import de.ngloader.timer.api.i18n.TimerMessage;
 import de.ngloader.timer.api.timer.Timer;
 import de.ngloader.timer.api.timer.TimerManager;
+import de.ngloader.timer.core.TimerMessageOLD;
 import de.ngloader.timer.core.timer.ImplTimer;
 
 public class CommandAdd implements TimerCommand {
@@ -48,7 +48,7 @@ public class CommandAdd implements TimerCommand {
 		TimerManager manager = plugin.getDefaultManager();
 
 		if (manager.getTimer(name) != null) {
-			commandInfo.response(TimerMessage.COMMAND_ADD_NAME_ALREADY_TAKEN, name);
+			commandInfo.response(TimerMessageOLD.COMMAND_ADD_NAME_ALREADY_TAKEN, name);
 			return TimerCommandResponse.OK;
 		}
 
@@ -56,17 +56,17 @@ public class CommandAdd implements TimerCommand {
 		plugin.getDatabaseManager().getDatabase().createTimer(timer);
 		manager.addTimer(timer);
 
-		commandInfo.response(TimerMessage.COMMAND_ADD_ADDED, name);
+		commandInfo.response(TimerMessageOLD.COMMAND_ADD_ADDED, name);
 		return TimerCommandResponse.OK;
 	}
 
 	@Override
-	public TimerMessage getDescriptionMessage() {
-		return TimerMessage.COMMAND_ADD_DESCRIPTION;
+	public TimerMessageOLD getDescriptionMessage() {
+		return TimerMessageOLD.COMMAND_ADD_DESCRIPTION;
 	}
 
 	@Override
-	public TimerMessage getSyntaxMessage() {
-		return TimerMessage.COMMAND_ADD_SYNTAX;
+	public TimerMessageOLD getSyntaxMessage() {
+		return TimerMessageOLD.COMMAND_ADD_SYNTAX;
 	}
 }

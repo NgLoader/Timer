@@ -9,11 +9,11 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import de.ngloader.timer.api.command.TimerCommand;
 import de.ngloader.timer.api.command.TimerCommandInfo;
 import de.ngloader.timer.api.command.TimerCommandResponse;
-import de.ngloader.timer.api.i18n.TimerMessage;
 import de.ngloader.timer.api.timer.action.TimerActionType;
 import de.ngloader.timer.api.timer.message.TimerMessageType;
 import de.ngloader.timer.api.timer.sort.TimerSortType;
 import de.ngloader.timer.api.timer.stop.TimerStopType;
+import de.ngloader.timer.core.TimerMessageOLD;
 import de.ngloader.timer.core.util.StringUtil;
 
 public class CommandType implements TimerCommand {
@@ -49,26 +49,26 @@ public class CommandType implements TimerCommand {
 						})
 				).executes(command -> {
 					TimerCommandInfo commandInfo = command.getSource();
-					commandInfo.response(TimerMessage.COMMAND_TYPE_SYNTAX);
+					commandInfo.response(TimerMessageOLD.COMMAND_TYPE_SYNTAX);
 					return TimerCommandResponse.OK;
 				});
 	}
 
 	public int handleType(TimerCommandInfo commandInfo, List<String> names) {
-		commandInfo.response(TimerMessage.COMMAND_TYPE_START);
-		names.forEach(name -> commandInfo.response(TimerMessage.COMMAND_TYPE_ENTRY, name));
-		commandInfo.response(TimerMessage.COMMAND_TYPE_END);
+		commandInfo.response(TimerMessageOLD.COMMAND_TYPE_START);
+		names.forEach(name -> commandInfo.response(TimerMessageOLD.COMMAND_TYPE_ENTRY, name));
+		commandInfo.response(TimerMessageOLD.COMMAND_TYPE_END);
 
 		return TimerCommandResponse.OK;
 	}
 
 	@Override
-	public TimerMessage getDescriptionMessage() {
-		return TimerMessage.COMMAND_TYPE_DESCRIPTION;
+	public TimerMessageOLD getDescriptionMessage() {
+		return TimerMessageOLD.COMMAND_TYPE_DESCRIPTION;
 	}
 
 	@Override
-	public TimerMessage getSyntaxMessage() {
-		return TimerMessage.COMMAND_TYPE_SYNTAX;
+	public TimerMessageOLD getSyntaxMessage() {
+		return TimerMessageOLD.COMMAND_TYPE_SYNTAX;
 	}
 }
